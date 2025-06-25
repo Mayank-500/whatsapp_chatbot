@@ -120,6 +120,7 @@ def send_whatsapp_message(to, message):
 
 # -------------------- Start Flask App --------------------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5057))  # Default to 5057 if PORT not set
+    port = int(os.environ.get("PORT", 5057))  # Use Render's dynamic port if set
     app.run(host="0.0.0.0", port=port)
+
 
