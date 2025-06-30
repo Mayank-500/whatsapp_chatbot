@@ -1,39 +1,22 @@
 {
-  "greeting": {
-    "keywords": ["hi", "hello", "namaste", "hey", "good morning", "good evening"],
-    "response": "🌿 Namaste! Welcome to *TAC – The Ayurveda Company*. How can I assist you today?"
+  "track order": {
+    "keywords": ["where is my order", "order status", "track", "order update"],
+    "response": "Tracking your latest orders... You can also type your mobile number for manual lookup."
   },
-  "track_order_auto": {
-    "keywords": ["where is my order", "track order", "order status", "order update", "delivery status"],
-    "response": "🔍 Just a moment while I check your latest order using your registered WhatsApp number..."
-  },
-  "track_order_id": {
-    "keywords": ["track my old order", "past order", "previous order", "last month order"],
-    "response": "📦 Please share your *Order ID* (e.g. #1234) so I can fetch the details from our records."
-  },
-  "multiple_orders": {
-    "keywords": ["i placed 2 orders", "more than one order", "two orders", "multiple orders"],
-    "response": "🧾 I see you’ve placed multiple orders. Let me list them all. Reply with the *Order ID* you want to track further."
-  },
-  "product_help": {
-    "keywords": ["ayurvedic product", "skin care", "hair", "face", "immunity", "best remedy", "products"],
-    "response": "🛒 You can browse our Ayurveda-backed products here: https://tacx.in/shop"
+  "product": {
+    "keywords": ["product", "ayurveda", "supplement", "remedy", "oil"],
+    "response": "Explore our wellness products here: https://tacx.in/shop"
   },
   "consultation": {
-    "keywords": ["doctor", "consultation", "consult", "need help", "talk to doctor"],
-    "response": "👩‍⚕️ You can book a *free consultation* with our Ayurvedic expert here: https://tacx.in/consult"
+    "keywords": ["consult", "talk to doctor", "wellness help", "ayurvedic consult"],
+    "response": "You can book your free Ayurveda consultation here: https://tacx.in/consult"
   },
   "complaint": {
-    "keywords": ["complaint", "not received", "wrong product", "issue", "refund", "return"],
-    "response": "🙏 Sorry for the trouble! Please raise a complaint here: https://tacx.in/support"
+    "keywords": ["issue", "complaint", "problem", "refund"],
+    "response": "We're here to help. Please submit your concern at: https://tacx.in/support"
   },
-  "delivery_time": {
-    "keywords": ["delivery time", "when will it arrive", "how many days"],
-    "response": "🚚 Our orders are usually delivered in 3–7 working days depending on your location. Let me check your order status for updates."
-  },
-  "default": {
-    "keywords": [],
-    "response": "🙏 I didn’t understand that clearly. You can ask about:\n• Order Status\n• Products\n• Consultation\n• Refunds or Complaints"
+  "greeting": {
+    "keywords": ["hi", "hello", "namaste", "hey", "good morning"],
+    "response": "Namaste 🙏 How may I support your wellness journey today?"
   }
 }
-
