@@ -1,122 +1,64 @@
+import json
+import re
 from flask import Flask, request
-import requests, json, os, re
-from dotenv import load_dotenv
-import openai
-from shopify_utils import get_orders_by_phone, format_order_details, normalize_phone_number
-
-# Load environment variables
-load_dotenv()
+from shopify_utils import get_order_by_phone
 
 app = Flask(__name__)
 
-ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
-PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
-VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-openai.api_key = OPENAI_API_KEY
+# Load FAQ data
+with open('faq.json', 'r') as f:
+    faq_data = json.load(f)
 
-FAQ_FILE = "faq.json"
-faq = {}
-if os.path.exists(FAQ_FILE):
-    with open(FAQ_FILE, "r") as f:
-        faq = json.load(f)
-
-@app.route("/webhook", methods=["GET"])
-def verify():
-    mode = request.args.get("hub.mode")
-    token = request.args.get("hub.verify_token")
-    challenge = request.args.get("hub.challenge")
-    if mode == "subscribe" and token == VERIFY_TOKEN:
-        return challenge, 200
-    return "Verification failed", 403
-
-@app.route("/webhook", methods=["POST"])
-def webhook():
-    data = request.get_json()
-    try:
-        message = data['entry'][0]['changes'][0]['value']['messages'][0]
-        user_id = message['from']
-        user_text = message['text']['body'].strip().lower()
-
-        # Step 1: Check predefined FAQs
-        reply = check_faq(user_text)
-
-        # Step 2: If not matched, check for order intent
-        if not reply and "order" in user_text:
-            phone_match = re.findall(r'\b\d{10}\b', user_text)
-            if phone_match:
-                # Manual phone input
-                phone_number = normalize_phone_number(phone_match[0])
-            else:
-                # Use WhatsApp number
-                phone_number = normalize_phone_number(user_id)
-
-            orders = get_orders_by_phone(phone_number)
-            if orders:
-                reply = format_order_details(orders)
-            else:
-                reply = "We couldn’t find any recent orders linked to this number. Please share your order ID or try again later."
-
-        # Step 3: If still no response, ask GPT for help
-        if not reply:
-            intent = get_intent_from_gpt(user_text)
-            reply = route_intent(intent)
-
-        send_whatsapp_message(user_id, reply)
-
-    except Exception as e:
-        print("Error:", e)
-
-    return "OK", 200
-
-def check_faq(message):
-    for category, entry in faq.items():
-        if isinstance(entry, dict) and "keywords" in entry:
-            for keyword in entry["keywords"]:
-                if keyword in message:
-                    return entry["response"]
+def match_faq(message):
+    for faq in faq_data:
+        if any(keyword.lower() in message.lower() for keyword in faq['keywords']):
+            return faq['response']
     return None
 
-def get_intent_from_gpt(message):
-    prompt = f"What is the user's intent for this message: \"{message}\"? Return one of: order, product, consultation, complaint, greeting, unknown."
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        return response.choices[0].message["content"].strip().lower()
-    except Exception as e:
-        print("OpenAI error:", e)
-        return "unknown"
+def normalize_phone_number(text):
+    match = re.search(r'(\+91[\- ]?|0)?[6-9]\d{9}', text)
+    if match:
+        number = re.sub(r'\D', '', match.group())
+        if not number.startswith('91'):
+            number = '91' + number[-10:]
+        return f'+{number}'
+    return None
 
-def route_intent(intent):
-    if intent == "order":
-        return "Please share your phone number or order ID to check your order details."
-    elif intent == "product":
-        return "Explore our products here: https://tacx.in/shop"
-    elif intent == "consultation":
-        return "Book your Ayurvedic consultation: https://tacx.in/consult"
-    elif intent == "complaint":
-        return "Sorry for the issue. Contact support: https://tacx.in/support"
-    elif intent == "greeting":
-        return "Namaste 🙏 How can we help you today?"
+def get_order_response(phone_number):
+    order = get_order_by_phone(phone_number)
+    if order:
+        return f"\ud83d\udce6 Here's your latest order:\n- Order ID: {order['name']}\n- Product: {order['line_items'][0]['name']}\n- Status: {order['fulfillment_status'] or 'Processing'}\nTrack: https://theayurvedaco.com/apps/tracktor/track"
     else:
-        return "I didn’t quite understand that. You can ask about products, orders, or support."
+        return "\u274c Sorry! No order found for this number.\nPlease check you used this number at checkout.\nManual track link: https://theayurvedaco.com/apps/tracktor/track"
 
-def send_whatsapp_message(to, message):
-    headers = {
-        "Authorization": f"Bearer {ACCESS_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "messaging_product": "whatsapp",
-        "to": to,
-        "text": {"body": message}
-    }
-    r = requests.post(f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages", headers=headers, json=payload)
-    print("Sent:", r.status_code, r.text)
+@app.route("/webhook", methods=["GET", "POST"])
+def webhook():
+    if request.method == "GET":
+        if request.args.get("hub.verify_token") == "nishu":
+            return request.args.get("hub.challenge")
+        return "Invalid verification token"
+
+    data = request.get_json()
+    try:
+        message_text = data['entry'][0]['changes'][0]['value']['messages'][0]['text']['body']
+        phone_number = data['entry'][0]['changes'][0]['value']['contacts'][0]['wa_id']
+
+        response = match_faq(message_text)
+
+        if not response:
+            if re.search(r'check order for', message_text.lower()):
+                num = normalize_phone_number(message_text)
+                response = get_order_response(num) if num else "Please provide a valid phone number."
+            elif re.search(r'(where is my order|order status)', message_text.lower()):
+                normalized = normalize_phone_number(phone_number)
+                response = get_order_response(normalized)
+            else:
+                response = "Namaste! Welcome to The Ayurveda Co. - your trusted wellness partner. How may we assist your healing journey today?"
+
+        return json.dumps({"reply": response})
+
+    except Exception as e:
+        return json.dumps({"reply": f"Error: {str(e)}"})
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5057))
-    app.run(host="0.0.0.0", port=port)
-
+    app.run(debug=True, port=10000)
