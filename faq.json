@@ -1,26 +1,41 @@
-[
-  {
-    "keywords": ["hello", "hi", "namaste", "hey"],
-    "response": "🙏 Namaste! Welcome to [The Ayurveda Co.](https://theayurvedaco.com) - your trusted wellness partner. How can we help you today?"
+{
+  "greeting": {
+    "keywords": ["hello", "hi", "namaste", "hey", "good morning", "good evening"],
+    "response": "🌿 Namaste! Welcome to The Ayurveda Co. — your trusted wellness partner. How may we assist your healing journey today?"
   },
-  {
-    "keywords": ["buy", "shop", "products", "purchase"],
-    "response": "🛍️ You can explore and buy our Ayurvedic products here: https://theayurvedaco.com/collections/all"
+  "consultation": {
+    "keywords": ["consultation", "doctor", "naadi", "pulse check", "ayurvedic advice", "free advice"],
+    "response": "🧘‍♀️ Book your *free Naadi Pariksha* consultation with our Ayurvedic experts here 👉 https://theayurvedaco.com/pages/consultation"
   },
-  {
-    "keywords": ["naadi", "consultation", "consult", "diagnosis", "appointment"],
-    "response": "📞 Book your free Naadi Pariksha consultation with our Ayurvedic experts here: https://tacx.in/consult"
+  "products": {
+    "keywords": ["product", "buy", "skin", "hair", "serum", "cream", "face wash", "recommend"],
+    "response": "🛍️ Discover our authentic Ayurvedic products crafted for holistic wellness 👉 https://theayurvedaco.com/collections/all-products"
   },
-  {
-    "keywords": ["track", "order status", "where is my order", "check order"],
+  "order": {
+    "keywords": ["order", "track", "status", "where is my order", "my order", "delivery", "shipping"],
     "response": "📦 Let me quickly check your order status based on your WhatsApp number... Please hold on a moment."
   },
-  {
-    "keywords": ["return", "wrong product", "refund"],
-    "response": "🚚 Received the wrong product? Please raise your concern here: https://theayurvedaco.com/pages/contact"
+  "support": {
+    "keywords": ["wrong", "issue", "problem", "return", "refund", "help", "not received", "damaged", "complaint"],
+    "response": "😔 We're sorry to hear that. Please raise your concern with our support team here 👉 https://theayurvedaco.com/pages/contact-us"
+  },
+  "thankyou": {
+    "keywords": ["thank you", "thanks", "dhanyavaad", "shukriya"],
+    "response": "🙏 You’re most welcome! Wishing you good health and Ayurvedic happiness 🌿"
+  },
+  "offers": {
+    "keywords": ["offer", "discount", "coupon", "deal", "promo"],
+    "response": "🎁 Grab our latest Ayurvedic offers and discounts here 👉 https://theayurvedaco.com/pages/ongoing-offers"
+  },
+  "ingredients": {
+    "keywords": ["ingredients", "what's inside", "herbs", "natural"],
+    "response": "🌱 Our products are infused with potent Ayurvedic herbs. Explore the power of ingredients 👉 https://theayurvedaco.com/pages/ingredient-science"
+  },
+  "subscription": {
+    "keywords": ["subscribe", "membership", "auto", "reorder", "monthly"],
+    "response": "🔄 You can subscribe to your favourites and save more monthly! Check this 👉 https://theayurvedaco.com/pages/subscribe-and-save"
   }
-]
-
+}
 
 
 
