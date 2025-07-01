@@ -46,7 +46,7 @@ def webhook():
             else:
                 phone_number = normalize_phone_number(user_id)
 
-            print("📞 Checking orders for:", phone_number)
+            print("📞 Final phone number used:", phone_number)
             orders = get_orders_by_phone(phone_number)
             if orders:
                 reply = format_order_details(orders)
