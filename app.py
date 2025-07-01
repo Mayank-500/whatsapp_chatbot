@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import openai
 from shopify_utils import get_orders_by_phone, format_order_details, normalize_phone_number
 
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
@@ -46,7 +47,8 @@ def webhook():
             else:
                 phone_number = normalize_phone_number(user_id)
 
-            print("📞 Final phone number used:", phone_number)
+            print("📞 Final phone number used:", phone_number, flush=True)
+
             orders = get_orders_by_phone(phone_number)
             if orders:
                 reply = format_order_details(orders)
@@ -63,7 +65,7 @@ def webhook():
         send_whatsapp_message(user_id, reply)
 
     except Exception as e:
-        print("🚨 Error in webhook:", e)
+        print("🚨 Error in webhook:", e, flush=True)
 
     return "OK", 200
 
@@ -84,7 +86,7 @@ def get_intent_from_gpt(message):
         )
         return response.choices[0].message["content"].strip().lower()
     except Exception as e:
-        print("OpenAI error:", e)
+        print("OpenAI error:", e, flush=True)
         return "unknown"
 
 def route_intent(intent):
@@ -112,7 +114,7 @@ def send_whatsapp_message(to, message):
         "text": {"body": message}
     }
     r = requests.post(f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages", headers=headers, json=payload)
-    print("📤 Sent to WhatsApp:", r.status_code, r.text)
+    print("📤 Sent to WhatsApp:", r.status_code, r.text, flush=True)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5057))

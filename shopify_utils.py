@@ -40,28 +40,29 @@ def get_orders_by_phone(phone_number):
     }
 
     url = f"https://{SHOPIFY_STORE_URL}/admin/api/2023-10/graphql.json"
+
     try:
-        print("📞 Shopify phone used:", phone_number)
-        print("📤 GraphQL query sent:\n", query["query"])
+        print("📞 Shopify phone used:", phone_number, flush=True)
+        print("📤 GraphQL query sent:\n", query["query"], flush=True)
 
         response = requests.post(url, json=query, headers=headers)
-        print("📦 Shopify response:\n", response.text)
+        print("📦 Shopify response:\n", response.text, flush=True)
 
         data = response.json()
         customers = data["data"]["customers"]["nodes"]
         if not customers:
-            print("⚠️ No customers found")
+            print("⚠️ No customers found", flush=True)
             return None
 
         orders = customers[0]["orders"]["nodes"]
         if not orders:
-            print("⚠️ No orders found for this customer")
+            print("⚠️ No orders found for this customer", flush=True)
             return None
 
         return orders
 
     except Exception as e:
-        print("❌ Shopify Error:", e)
+        print("❌ Shopify Error:", e, flush=True)
         return None
 
 def format_order_details(orders):
