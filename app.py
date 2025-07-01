@@ -1,5 +1,5 @@
 from flask import Flask, request
-import requests, json, os
+import requests, json, os, re
 from dotenv import load_dotenv
 import openai
 from shopify_utils import get_orders_by_phone, format_order_details, normalize_phone_number
@@ -35,21 +35,29 @@ def webhook():
     data = request.get_json()
     try:
         message = data['entry'][0]['changes'][0]['value']['messages'][0]
-        user_id = message['from']  # WhatsApp phone number
+        user_id = message['from']
         user_text = message['text']['body'].strip().lower()
 
+        # Step 1: Check predefined FAQs
         reply = check_faq(user_text)
 
-        # Order check flow
+        # Step 2: If not matched, check for order intent
         if not reply and "order" in user_text:
-            sanitized_number = normalize_phone_number(user_id)
-            orders = get_orders_by_phone(sanitized_number)
+            phone_match = re.findall(r'\b\d{10}\b', user_text)
+            if phone_match:
+                # Manual phone input
+                phone_number = normalize_phone_number(phone_match[0])
+            else:
+                # Use WhatsApp number
+                phone_number = normalize_phone_number(user_id)
+
+            orders = get_orders_by_phone(phone_number)
             if orders:
                 reply = format_order_details(orders)
             else:
-                reply = "We couldn’t find recent orders linked to this number. You can reply with your order ID to check manually."
+                reply = "We couldn’t find any recent orders linked to this number. Please share your order ID or try again later."
 
-        # GPT fallback
+        # Step 3: If still no response, ask GPT for help
         if not reply:
             intent = get_intent_from_gpt(user_text)
             reply = route_intent(intent)
@@ -57,7 +65,7 @@ def webhook():
         send_whatsapp_message(user_id, reply)
 
     except Exception as e:
-        print("Webhook Error:", e)
+        print("Error:", e)
 
     return "OK", 200
 
@@ -70,7 +78,7 @@ def check_faq(message):
     return None
 
 def get_intent_from_gpt(message):
-    prompt = f"What is the user's intent for this message: \"{message}\"? Choose one: order, product, consultation, complaint, greeting, unknown."
+    prompt = f"What is the user's intent for this message: \"{message}\"? Return one of: order, product, consultation, complaint, greeting, unknown."
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -78,22 +86,22 @@ def get_intent_from_gpt(message):
         )
         return response.choices[0].message["content"].strip().lower()
     except Exception as e:
-        print("OpenAI Error:", e)
+        print("OpenAI error:", e)
         return "unknown"
 
 def route_intent(intent):
     if intent == "order":
-        return "Please share your phone number or order ID so we can check your order details."
+        return "Please share your phone number or order ID to check your order details."
     elif intent == "product":
-        return "Check out our product collection: https://tacx.in/shop"
+        return "Explore our products here: https://tacx.in/shop"
     elif intent == "consultation":
-        return "Book a free consultation here: https://tacx.in/consult"
+        return "Book your Ayurvedic consultation: https://tacx.in/consult"
     elif intent == "complaint":
-        return "Sorry for the trouble. You can raise a support request here: https://tacx.in/support"
+        return "Sorry for the issue. Contact support: https://tacx.in/support"
     elif intent == "greeting":
-        return "Namaste! 🌿 How can I assist you today?"
+        return "Namaste 🙏 How can we help you today?"
     else:
-        return "I didn’t get that. You can ask about your orders, products, or consultations."
+        return "I didn’t quite understand that. You can ask about products, orders, or support."
 
 def send_whatsapp_message(to, message):
     headers = {
@@ -111,3 +119,4 @@ def send_whatsapp_message(to, message):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5057))
     app.run(host="0.0.0.0", port=port)
+

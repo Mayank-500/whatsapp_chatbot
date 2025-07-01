@@ -1,40 +1,42 @@
 {
-  "order_status": {
-    "keywords": ["where is my order", "order status", "track order", "order update", "order", "order details"],
-    "response": "🌿 Let me check your recent order linked to your WhatsApp number... Please wait a moment."
-  },
-  "multiple_orders": {
-    "keywords": ["previous order", "old order", "another order", "past order", "2 orders", "placed two orders"],
-    "response": "🧾 We noticed you may have placed multiple orders. Could you please share the *Order ID* for the one you want to track?"
-  },
-  "order_not_found": {
-    "keywords": ["no order found", "not found", "why not working"],
-    "response": "😔 We couldn’t locate any orders linked to this number. Kindly share your *Order ID* or ensure you’re messaging from the number used while placing the order."
-  },
-  "product_inquiry": {
-    "keywords": ["product", "products", "buy", "purchase", "cream", "serum", "hair oil", "skin care"],
-    "response": "🌱 You can explore our Ayurvedic products here: https://tacx.in/shop"
+  "greeting": {
+    "keywords": ["hello", "hi", "namaste", "hey", "good morning", "good evening"],
+    "response": "🌿 Namaste! Welcome to The Ayurveda Co. — your trusted wellness partner. How may we assist your healing journey today?"
   },
   "consultation": {
-    "keywords": ["consult", "consultation", "talk to doctor", "free consultation", "naadi pariksha", "health diagnosis"],
-    "response": "👨‍⚕️ Book your free personalized consultation with our Ayurvedic expert here: https://tacx.in/consult"
+    "keywords": ["consultation", "doctor", "naadi", "pulse check", "ayurvedic advice", "free advice"],
+    "response": "🧘‍♀️ Book your *free Naadi Pariksha* consultation with our Ayurvedic experts here 👉 https://theayurvedaco.com/pages/consultation"
+  },
+  "products": {
+    "keywords": ["product", "buy", "skin", "hair", "serum", "cream", "face wash", "recommend"],
+    "response": "🛍️ Discover our authentic Ayurvedic products crafted for holistic wellness 👉 https://theayurvedaco.com/collections/all-products"
+  },
+  "order": {
+    "keywords": ["order", "track", "status", "where is my order", "my order", "delivery", "shipping"],
+    "response": "📦 Let me quickly check your order status based on your WhatsApp number... Please hold on a moment."
   },
   "support": {
-    "keywords": ["complaint", "issue", "problem", "damaged", "wrong product", "support"],
-    "response": "🛠️ We're here to help! Raise your concern here: https://tacx.in/support"
+    "keywords": ["wrong", "issue", "problem", "return", "refund", "help", "not received", "damaged", "complaint"],
+    "response": "😔 We're sorry to hear that. Please raise your concern with our support team here 👉 https://theayurvedaco.com/pages/contact-us"
   },
-  "greetings": {
-    "keywords": ["hi", "hello", "hey", "namaste", "good morning", "good evening"],
-    "response": "Namaste 🙏 Welcome to TACX Ayurveda! How may we help you today?"
+  "thankyou": {
+    "keywords": ["thank you", "thanks", "dhanyavaad", "shukriya"],
+    "response": "🙏 You’re most welcome! Wishing you good health and Ayurvedic happiness 🌿"
   },
-  "thanks": {
-    "keywords": ["thanks", "thank you", "thankyou", "shukriya", "dhanyawaad"],
-    "response": "You’re most welcome 🌿 Stay healthy, stay Ayurvedic!"
+  "offers": {
+    "keywords": ["offer", "discount", "coupon", "deal", "promo"],
+    "response": "🎁 Grab our latest Ayurvedic offers and discounts here 👉 https://theayurvedaco.com/pages/ongoing-offers"
   },
-  "default_fallback": {
-    "keywords": ["help", "assist", "confused", "don't know", "what to do"],
-    "response": "I can help with 🧾 Orders, 🌿 Products, 👨‍⚕️ Consultations, and 🛠️ Support. How may I assist you?"
+  "ingredients": {
+    "keywords": ["ingredients", "what's inside", "herbs", "natural"],
+    "response": "🌱 Our products are infused with potent Ayurvedic herbs. Explore the power of ingredients 👉 https://theayurvedaco.com/pages/ingredient-science"
+  },
+  "subscription": {
+    "keywords": ["subscribe", "membership", "auto", "reorder", "monthly"],
+    "response": "🔄 You can subscribe to your favourites and save more monthly! Check this 👉 https://theayurvedaco.com/pages/subscribe-and-save"
   }
 }
+
+
 
 
