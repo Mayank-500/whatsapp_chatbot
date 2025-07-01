@@ -1,19 +1,18 @@
-import requests, os
+import os
+import requests
 
-SHOPIFY_API_TOKEN = os.getenv("SHOPIFY_API_TOKEN")
-SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL")
+SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL")  # GraphQL endpoint
+SHOPIFY_ACCESS_TOKEN = os.getenv("SHOPIFY_ACCESS_TOKEN")
 
-def normalize_phone_number(phone):
-    phone = phone.replace("+91", "").replace(" ", "").strip()
-    if len(phone) == 12 and phone.startswith("91"):
-        return phone[2:]
-    return phone[-10:]
 
-def get_orders_by_phone(phone_number):
+def get_order_details_by_phone(phone_number):
+    """
+    Fetch latest Shopify orders by phone number (GraphQL).
+    """
     query = {
         "query": f"""
         {{
-            customers(query: "phone:+91{phone_number}") {{
+            customers(first: 10, query: "phone:+91{phone_number}") {{
                 nodes {{
                     orders(first: 5, sortKey: CREATED_AT, reverse: true) {{
                         nodes {{
@@ -35,43 +34,42 @@ def get_orders_by_phone(phone_number):
     }
 
     headers = {
-        "X-Shopify-Access-Token": SHOPIFY_API_TOKEN,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-Shopify-Access-Token": SHOPIFY_ACCESS_TOKEN
     }
 
-    url = f"https://{SHOPIFY_STORE_URL}/admin/api/2023-10/graphql.json"
+    response = requests.post(SHOPIFY_STORE_URL, json=query, headers=headers)
 
     try:
-        print("📞 Shopify phone used:", phone_number, flush=True)
-        print("📤 GraphQL query sent:\n", query["query"], flush=True)
-
-        response = requests.post(url, json=query, headers=headers)
-        print("📦 Shopify response:\n", response.text, flush=True)
-
-        data = response.json()
-        customers = data["data"]["customers"]["nodes"]
-        if not customers:
-            print("⚠️ No customers found", flush=True)
-            return None
-
-        orders = customers[0]["orders"]["nodes"]
-        if not orders:
-            print("⚠️ No orders found for this customer", flush=True)
-            return None
-
-        return orders
-
+        return response.json()
     except Exception as e:
-        print("❌ Shopify Error:", e, flush=True)
-        return None
+        print(f"❌ Error parsing Shopify response: {e}")
+        return {"error": "Invalid JSON response"}
 
-def format_order_details(orders):
-    message = "📦 Your recent orders:\n\n"
-    for order in orders:
-        message += f"🧾 Order: {order['name']}\n"
-        message += f"📅 Date: {order['createdAt'][:10]}\n"
-        message += f"🚚 Status: {order['displayFulfillmentStatus'] or 'PENDING'}\n📦 Items:\n"
-        for item in order["lineItems"]["nodes"]:
-            message += f" - {item['title']} x{item['quantity']}\n"
-        message += "\n"
-    return message
+
+def format_order_summary(order):
+    """
+    Return a formatted string of a Shopify order for WhatsApp message.
+    """
+    name = order.get("name")
+    status = order.get("displayFulfillmentStatus")
+    items = order.get("lineItems", {}).get("nodes", [])
+
+    item_lines = "\n".join([f"  - {item['title']} (x{item['quantity']})" for item in items])
+    return f"🧾 Order: {name}\n📦 Status: {status}\n🛍️ Items:\n{item_lines}"
+
+
+# Optional REST API call for future use
+def get_order_by_id_rest(order_id):
+    url = f"https://the-ayurveda-co.myshopify.com/admin/api/2024-04/orders/{order_id}.json"
+    headers = {
+        "X-Shopify-Access-Token": SHOPIFY_ACCESS_TOKEN
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        print(f"❌ REST API Error for Order ID {order_id}: {e}")
+        return None
