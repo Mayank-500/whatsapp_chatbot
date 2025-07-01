@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import openai
 from shopify_utils import get_orders_by_phone, format_order_details, normalize_phone_number
 
-# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
@@ -40,7 +39,6 @@ def webhook():
 
         reply = None
 
-        # Step 1: Try Shopify order fetch first if message includes "order" or 10-digit phone number
         if "order" in user_text or re.search(r'\b\d{10}\b', user_text):
             phone_match = re.findall(r'\b\d{10}\b', user_text)
             if phone_match:
@@ -55,11 +53,9 @@ def webhook():
             else:
                 reply = "❗We couldn’t find any recent orders linked to this number. Please share your order ID or try again later."
 
-        # Step 2: If not handled, check FAQ
         if not reply:
             reply = check_faq(user_text)
 
-        # Step 3: Fallback to GPT
         if not reply:
             intent = get_intent_from_gpt(user_text)
             reply = route_intent(intent)
@@ -116,7 +112,7 @@ def send_whatsapp_message(to, message):
         "text": {"body": message}
     }
     r = requests.post(f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages", headers=headers, json=payload)
-    print("📤 WhatsApp Response:", r.status_code, r.text)
+    print("📤 Sent to WhatsApp:", r.status_code, r.text)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5057))
