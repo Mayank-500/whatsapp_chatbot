@@ -1,8 +1,8 @@
 from flask import Flask, request
-import requests, json, os, re
+import requests, json, os
 from dotenv import load_dotenv
 import openai
-from shopify_utils import get_order_details_by_phone
+from shopify_utils import get_orders_by_phone, format_order_details, normalize_phone_number
 
 # Load environment variables
 load_dotenv()
@@ -13,14 +13,8 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-# Set OpenAI Key
 openai.api_key = OPENAI_API_KEY
 
-# WhatsApp API URL
-WHATSAPP_API_URL = f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages"
-
-# Load FAQ file
 FAQ_FILE = "faq.json"
 faq = {}
 if os.path.exists(FAQ_FILE):
@@ -42,34 +36,28 @@ def webhook():
     try:
         message = data['entry'][0]['changes'][0]['value']['messages'][0]
         user_id = message['from']
-        user_text = message['text']['body'].lower()
+        user_text = message['text']['body'].strip().lower()
 
-        # Manual phone number input handling
-        phone_match = re.findall(r'\b\d{10,13}\b', user_text)
-        if phone_match:
-            phone_to_check = phone_match[0][-10:]
-            reply = get_order_details_by_phone(phone_to_check)
-            send_whatsapp_message(user_id, reply)
-            return "OK", 200
-
-        # First try structured FAQ
+        # Step 1: Check for predefined FAQ
         reply = check_faq(user_text)
 
-        # GPT fallback
-        if reply is None:
-            intent = get_intent_from_gpt(user_text)
-            if intent == "order":
-                reply = get_order_details_by_phone(user_id[-10:])  # last 10 digits
+        # Step 2: Handle special Shopify flow (e.g. order inquiry)
+        if not reply and "order" in user_text:
+            orders = get_orders_by_phone(user_id)
+            if orders:
+                reply = format_order_details(orders)
             else:
-                reply = route_intent(intent)
-            faq[user_text] = reply
-            with open(FAQ_FILE, "w") as f:
-                json.dump(faq, f, indent=2)
+                reply = "Sorry, we couldn't find any recent orders linked to this number. Please provide your order ID or try again later."
+
+        # Step 3: Use GPT to infer intent if not found
+        if not reply:
+            intent = get_intent_from_gpt(user_text)
+            reply = route_intent(intent)
 
         send_whatsapp_message(user_id, reply)
 
     except Exception as e:
-        print("Webhook Error:", e)
+        print("Error:", e)
 
     return "OK", 200
 
@@ -82,7 +70,7 @@ def check_faq(message):
     return None
 
 def get_intent_from_gpt(message):
-    prompt = f"What is the user's intent for this message: \"{message}\"? Return one of: order, product, consultation, complaint, greeting, unknown."
+    prompt = f"What is the user's intent for this message: \"{message}\"? Return one of the following categories: order, product, consultation, complaint, greeting, unknown."
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -94,15 +82,18 @@ def get_intent_from_gpt(message):
         return "unknown"
 
 def route_intent(intent):
-    responses = {
-        "order": "Let me check your order status using your phone number...",
-        "product": "Please explore our natural health products at https://tacx.in/shop",
-        "consultation": "You can book a free wellness consultation here: https://tacx.in/consult",
-        "complaint": "We’re sorry for the issue. Please raise it here: https://tacx.in/support",
-        "greeting": "Namaste 🙏 How can we help you on your wellness journey today?",
-        "unknown": "I’m not sure I understood. Try asking about your order, products, or a consultation."
-    }
-    return responses.get(intent, responses["unknown"])
+    if intent == "order":
+        return "Please share your phone number or order ID so we can check your order details."
+    elif intent == "product":
+        return "Check out our product collection: https://tacx.in/shop"
+    elif intent == "consultation":
+        return "Book a free consultation here: https://tacx.in/consult"
+    elif intent == "complaint":
+        return "Sorry for the inconvenience. Raise your concern here: https://tacx.in/support"
+    elif intent == "greeting":
+        return "Namaste 👋 How can I assist you today?"
+    else:
+        return "I'm not sure I understand. You can ask about products, orders, or consultations."
 
 def send_whatsapp_message(to, message):
     headers = {
@@ -114,9 +105,9 @@ def send_whatsapp_message(to, message):
         "to": to,
         "text": {"body": message}
     }
-    r = requests.post(WHATSAPP_API_URL, headers=headers, json=payload)
+    r = requests.post(f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages", headers=headers, json=payload)
     print("Sent:", r.status_code, r.text)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 5057))
     app.run(host="0.0.0.0", port=port)

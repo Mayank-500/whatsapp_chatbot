@@ -1,22 +1,23 @@
 {
-  "track order": {
-    "keywords": ["where is my order", "order status", "track", "order update"],
-    "response": "Tracking your latest orders... You can also type your mobile number for manual lookup."
+  "greeting": {
+    "keywords": ["hello", "hi", "namaste", "hey"],
+    "response": "Namaste 👋 Welcome to The Ayurveda Co. How can I help you today?"
   },
   "product": {
-    "keywords": ["product", "ayurveda", "supplement", "remedy", "oil"],
-    "response": "Explore our wellness products here: https://tacx.in/shop"
+    "keywords": ["skin", "hair", "product", "cream", "serum", "oil"],
+    "response": "You can explore our full product range at: https://tacx.in/shop"
+  },
+  "order": {
+    "keywords": ["order", "track", "delivery", "status", "where is my order"],
+    "response": "Please wait while I check your order details linked to your number..."
   },
   "consultation": {
-    "keywords": ["consult", "talk to doctor", "wellness help", "ayurvedic consult"],
-    "response": "You can book your free Ayurveda consultation here: https://tacx.in/consult"
+    "keywords": ["consult", "ayurveda help", "personal care"],
+    "response": "Book your free Ayurvedic consultation here: https://tacx.in/consult"
   },
   "complaint": {
-    "keywords": ["issue", "complaint", "problem", "refund"],
-    "response": "We're here to help. Please submit your concern at: https://tacx.in/support"
-  },
-  "greeting": {
-    "keywords": ["hi", "hello", "namaste", "hey", "good morning"],
-    "response": "Namaste 🙏 How may I support your wellness journey today?"
+    "keywords": ["problem", "complaint", "issue", "refund"],
+    "response": "We're sorry to hear that. Please submit your issue at: https://tacx.in/support"
   }
 }
+

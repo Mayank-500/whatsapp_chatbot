@@ -3,54 +3,67 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL")
 SHOPIFY_API_TOKEN = os.getenv("SHOPIFY_API_TOKEN")
+SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL")
 
-def get_order_details_by_phone(phone_number):
-    query = """
-    {
-      orders(first: 3, query: "phone:*%s") {
-        edges {
-          node {
-            name
-            createdAt
-            fulfillmentStatus
-            financialStatus
-            lineItems(first: 5) {
-              edges {
-                node {
+def normalize_phone_number(raw_phone):
+    if not raw_phone:
+        return ""
+    phone = raw_phone.strip()
+    if phone.startswith("0"):
+        phone = phone[1:]
+    if not phone.startswith("+91"):
+        phone = "+91" + phone
+    return phone
+
+def get_orders_by_phone(phone):
+    normalized_phone = normalize_phone_number(phone)
+    query = f'''
+    {{
+      customers(first: 1, query: "phone:*{normalized_phone}") {{
+        edges {{
+          node {{
+            firstName
+            phone
+            orders(first: 5, sortKey: PROCESSED_AT, reverse: true) {{
+              edges {{
+                node {{
                   name
-                  quantity
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    """ % phone_number
-
-    url = f"https://{SHOPIFY_STORE_URL}/admin/api/2024-01/graphql.json"
+                  financialStatus
+                  fulfillmentStatus
+                  processedAt
+                }}
+              }}
+            }}
+          }}
+        }}
+      }}
+    }}
+    '''
     headers = {
         "X-Shopify-Access-Token": SHOPIFY_API_TOKEN,
         "Content-Type": "application/json"
     }
-
-    response = requests.post(url, json={"query": query}, headers=headers)
+    url = f"https://{SHOPIFY_STORE_URL}/admin/api/2023-10/graphql.json"
+    response = requests.post(url, headers=headers, json={"query": query})
     try:
-        data = response.json()["data"]["orders"]["edges"]
-        if not data:
-            return f"No orders found for number ending in {phone_number[-4:]}."
-
-        messages = []
-        for order in data:
-            node = order["node"]
-            items = "\n".join([f"- {li['node']['name']} x{li['node']['quantity']}" for li in node["lineItems"]["edges"]])
-            msg = f"🧾 Order: {node['name']}\n📦 Status: {node['fulfillmentStatus']}\n💰 Payment: {node['financialStatus']}\n📅 Date: {node['createdAt'][:10]}\n🛍️ Items:\n{items}"
-            messages.append(msg)
-
-        return "\n\n".join(messages)
+        data = response.json()
+        customer_edges = data["data"]["customers"]["edges"]
+        if customer_edges:
+            return customer_edges[0]["node"]["orders"]["edges"]
     except Exception as e:
-        print("Shopify Error:", e)
-        return "Sorry, we couldn’t fetch your order details right now."
+        print("Shopify error:", e)
+    return []
+
+def format_order_details(order_edges):
+    if not order_edges:
+        return "No recent orders found."
+    latest_order = order_edges[0]["node"]
+    response = f"🧾 *Order Details:*\n"
+    response += f"📦 Order ID: {latest_order['name']}\n"
+    response += f"💰 Payment: {latest_order['financialStatus']}\n"
+    response += f"🚚 Status: {latest_order['fulfillmentStatus']}\n"
+    response += f"📅 Ordered on: {latest_order['processedAt'][:10]}\n"
+    return response
+
 
