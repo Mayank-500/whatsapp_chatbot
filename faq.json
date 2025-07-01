@@ -1,23 +1,40 @@
 {
-  "greeting": {
-    "keywords": ["hello", "hi", "namaste", "hey"],
-    "response": "Namaste 👋 Welcome to The Ayurveda Co. How can I help you today?"
+  "order_status": {
+    "keywords": ["where is my order", "order status", "track order", "order update", "order", "order details"],
+    "response": "🌿 Let me check your recent order linked to your WhatsApp number... Please wait a moment."
   },
-  "product": {
-    "keywords": ["skin", "hair", "product", "cream", "serum", "oil"],
-    "response": "You can explore our full product range at: https://tacx.in/shop"
+  "multiple_orders": {
+    "keywords": ["previous order", "old order", "another order", "past order", "2 orders", "placed two orders"],
+    "response": "🧾 We noticed you may have placed multiple orders. Could you please share the *Order ID* for the one you want to track?"
   },
-  "order": {
-    "keywords": ["order", "track", "delivery", "status", "where is my order"],
-    "response": "Please wait while I check your order details linked to your number..."
+  "order_not_found": {
+    "keywords": ["no order found", "not found", "why not working"],
+    "response": "😔 We couldn’t locate any orders linked to this number. Kindly share your *Order ID* or ensure you’re messaging from the number used while placing the order."
+  },
+  "product_inquiry": {
+    "keywords": ["product", "products", "buy", "purchase", "cream", "serum", "hair oil", "skin care"],
+    "response": "🌱 You can explore our Ayurvedic products here: https://tacx.in/shop"
   },
   "consultation": {
-    "keywords": ["consult", "ayurveda help", "personal care"],
-    "response": "Book your free Ayurvedic consultation here: https://tacx.in/consult"
+    "keywords": ["consult", "consultation", "talk to doctor", "free consultation", "naadi pariksha", "health diagnosis"],
+    "response": "👨‍⚕️ Book your free personalized consultation with our Ayurvedic expert here: https://tacx.in/consult"
   },
-  "complaint": {
-    "keywords": ["problem", "complaint", "issue", "refund"],
-    "response": "We're sorry to hear that. Please submit your issue at: https://tacx.in/support"
+  "support": {
+    "keywords": ["complaint", "issue", "problem", "damaged", "wrong product", "support"],
+    "response": "🛠️ We're here to help! Raise your concern here: https://tacx.in/support"
+  },
+  "greetings": {
+    "keywords": ["hi", "hello", "hey", "namaste", "good morning", "good evening"],
+    "response": "Namaste 🙏 Welcome to TACX Ayurveda! How may we help you today?"
+  },
+  "thanks": {
+    "keywords": ["thanks", "thank you", "thankyou", "shukriya", "dhanyawaad"],
+    "response": "You’re most welcome 🌿 Stay healthy, stay Ayurvedic!"
+  },
+  "default_fallback": {
+    "keywords": ["help", "assist", "confused", "don't know", "what to do"],
+    "response": "I can help with 🧾 Orders, 🌿 Products, 👨‍⚕️ Consultations, and 🛠️ Support. How may I assist you?"
   }
 }
+
 

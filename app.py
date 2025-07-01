@@ -35,21 +35,21 @@ def webhook():
     data = request.get_json()
     try:
         message = data['entry'][0]['changes'][0]['value']['messages'][0]
-        user_id = message['from']
+        user_id = message['from']  # WhatsApp phone number
         user_text = message['text']['body'].strip().lower()
 
-        # Step 1: Check for predefined FAQ
         reply = check_faq(user_text)
 
-        # Step 2: Handle special Shopify flow (e.g. order inquiry)
+        # Order check flow
         if not reply and "order" in user_text:
-            orders = get_orders_by_phone(user_id)
+            sanitized_number = normalize_phone_number(user_id)
+            orders = get_orders_by_phone(sanitized_number)
             if orders:
                 reply = format_order_details(orders)
             else:
-                reply = "Sorry, we couldn't find any recent orders linked to this number. Please provide your order ID or try again later."
+                reply = "We couldn’t find recent orders linked to this number. You can reply with your order ID to check manually."
 
-        # Step 3: Use GPT to infer intent if not found
+        # GPT fallback
         if not reply:
             intent = get_intent_from_gpt(user_text)
             reply = route_intent(intent)
@@ -57,7 +57,7 @@ def webhook():
         send_whatsapp_message(user_id, reply)
 
     except Exception as e:
-        print("Error:", e)
+        print("Webhook Error:", e)
 
     return "OK", 200
 
@@ -70,7 +70,7 @@ def check_faq(message):
     return None
 
 def get_intent_from_gpt(message):
-    prompt = f"What is the user's intent for this message: \"{message}\"? Return one of the following categories: order, product, consultation, complaint, greeting, unknown."
+    prompt = f"What is the user's intent for this message: \"{message}\"? Choose one: order, product, consultation, complaint, greeting, unknown."
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -78,7 +78,7 @@ def get_intent_from_gpt(message):
         )
         return response.choices[0].message["content"].strip().lower()
     except Exception as e:
-        print("OpenAI error:", e)
+        print("OpenAI Error:", e)
         return "unknown"
 
 def route_intent(intent):
@@ -89,11 +89,11 @@ def route_intent(intent):
     elif intent == "consultation":
         return "Book a free consultation here: https://tacx.in/consult"
     elif intent == "complaint":
-        return "Sorry for the inconvenience. Raise your concern here: https://tacx.in/support"
+        return "Sorry for the trouble. You can raise a support request here: https://tacx.in/support"
     elif intent == "greeting":
-        return "Namaste 👋 How can I assist you today?"
+        return "Namaste! 🌿 How can I assist you today?"
     else:
-        return "I'm not sure I understand. You can ask about products, orders, or consultations."
+        return "I didn’t get that. You can ask about your orders, products, or consultations."
 
 def send_whatsapp_message(to, message):
     headers = {
