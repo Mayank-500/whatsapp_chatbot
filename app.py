@@ -38,26 +38,28 @@ def webhook():
         user_id = message['from']
         user_text = message['text']['body'].strip().lower()
 
-        # Step 1: Check predefined FAQs
-        reply = check_faq(user_text)
+        reply = None
 
-        # Step 2: If not matched, check for order intent
-        if not reply and "order" in user_text:
+        # Step 1: Try Shopify order fetch first if message includes "order" or 10-digit phone number
+        if "order" in user_text or re.search(r'\b\d{10}\b', user_text):
             phone_match = re.findall(r'\b\d{10}\b', user_text)
             if phone_match:
-                # Manual phone input
                 phone_number = normalize_phone_number(phone_match[0])
             else:
-                # Use WhatsApp number
                 phone_number = normalize_phone_number(user_id)
 
+            print("📞 Checking orders for:", phone_number)
             orders = get_orders_by_phone(phone_number)
             if orders:
                 reply = format_order_details(orders)
             else:
-                reply = "We couldn’t find any recent orders linked to this number. Please share your order ID or try again later."
+                reply = "❗We couldn’t find any recent orders linked to this number. Please share your order ID or try again later."
 
-        # Step 3: If still no response, ask GPT for help
+        # Step 2: If not handled, check FAQ
+        if not reply:
+            reply = check_faq(user_text)
+
+        # Step 3: Fallback to GPT
         if not reply:
             intent = get_intent_from_gpt(user_text)
             reply = route_intent(intent)
@@ -65,7 +67,7 @@ def webhook():
         send_whatsapp_message(user_id, reply)
 
     except Exception as e:
-        print("Error:", e)
+        print("🚨 Error in webhook:", e)
 
     return "OK", 200
 
@@ -114,7 +116,7 @@ def send_whatsapp_message(to, message):
         "text": {"body": message}
     }
     r = requests.post(f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages", headers=headers, json=payload)
-    print("Sent:", r.status_code, r.text)
+    print("📤 WhatsApp Response:", r.status_code, r.text)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5057))
