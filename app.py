@@ -2,11 +2,16 @@ import os
 from flask import Flask, request
 import requests
 from shopify_utils import get_order_details_by_phone, format_order_summary
+import json
 
 app = Flask(__name__)
 
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN", "nishu")
 WHATSAPP_TOKEN = os.getenv("WHATSAPP_TOKEN")
+
+# Load FAQ intents from JSON
+with open("faq.json", "r") as f:
+    faq_data = json.load(f)
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -23,12 +28,21 @@ def webhook():
         print("🔔 Incoming webhook:", data)
 
         try:
+            message_text = data['entry'][0]['changes'][0]['value']['messages'][0]['text']['body'].lower()
             phone_number = data['entry'][0]['changes'][0]['value']['messages'][0]['from'][-10:]
             print(f"📞 Final phone number used: {phone_number}")
         except Exception as e:
-            print(f"🚨 Error extracting phone number: {e}")
+            print(f"🚨 Error in webhook: {e}")
             return "error", 200
 
+        # Check for FAQ match
+        for intent in faq_data.values():
+            for keyword in intent['keywords']:
+                if keyword.lower() in message_text:
+                    send_whatsapp_message(phone_number, intent['response'])
+                    return "ok", 200
+
+        # If not FAQ, check Shopify orders
         shopify_response = get_order_details_by_phone(phone_number)
         print("📦 Shopify response:\n", shopify_response)
 
@@ -49,6 +63,7 @@ def webhook():
         send_whatsapp_message(phone_number, message_to_send)
         return "ok", 200
 
+
 def send_whatsapp_message(phone_number, message):
     payload = {
         "messaging_product": "whatsapp",
@@ -63,13 +78,13 @@ def send_whatsapp_message(phone_number, message):
     }
 
     res = requests.post(
-        "https://graph.facebook.com/v18.0/YOUR_PHONE_NUMBER_ID/messages",  # Replace with your phone number ID
+        "https://graph.facebook.com/v18.0/YOUR_PHONE_NUMBER_ID/messages",
         json=payload,
         headers=headers
     )
     print("📤 Sent to WhatsApp:", res.status_code, res.text)
 
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
-
