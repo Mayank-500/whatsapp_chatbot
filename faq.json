@@ -1,41 +1,10 @@
 {
   "greeting": {
     "keywords": ["hello", "hi", "namaste", "hey", "good morning", "good evening"],
-    "response": "🙏 Namaste! Welcome to The Ayurveda Co. How may we assist you today?"
-  },
-  "consultation": {
-    "keywords": ["consultation", "doctor", "naadi", "pulse check", "ayurvedic advice", "free advice"],
-    "response": "🧘 Book your free Naadi Pariksha consultation with our Ayurvedic experts here: https://theayurvedaco.com/pages/consultation"
-  },
-  "products": {
-    "keywords": ["product", "buy", "skin", "hair", "serum", "cream", "face wash", "recommend"],
-    "response": "🛍️ Explore our Ayurvedic products for wellness: https://theayurvedaco.com/collections/all-products"
-  },
-  "order": {
-    "keywords": ["order", "track", "status", "where is my order", "my order", "delivery", "shipping"],
-    "response": "📦 Let me check your order status. Please wait while I fetch your details."
-  },
-  "support": {
-    "keywords": ["wrong", "issue", "problem", "return", "refund", "help", "not received", "damaged", "complaint"],
-    "response": "🛠️ Sorry to hear that. Please raise your concern here: https://theayurvedaco.com/pages/contact-us"
-  },
-  "thankyou": {
-    "keywords": ["thank you", "thanks", "dhanyavaad", "shukriya"],
-    "response": "😊 You're welcome! Wishing you good health and wellness."
-  },
-  "offers": {
-    "keywords": ["offer", "discount", "coupon", "deal", "promo"],
-    "response": "🎁 Check our latest Ayurvedic offers: https://theayurvedaco.com/pages/ongoing-offers"
-  },
-  "ingredients": {
-    "keywords": ["ingredients", "what's inside", "herbs", "natural"],
-    "response": "🌿 Our products contain authentic Ayurvedic herbs. Learn more: https://theayurvedaco.com/pages/ingredient-science"
-  },
-  "subscription": {
-    "keywords": ["subscribe", "membership", "auto", "reorder", "monthly"],
-    "response": "🔁 Subscribe and save on your favourite products: https://theayurvedaco.com/pages/subscribe-and-save"
+    "response": "Namaste! Welcome to The Ayurveda Co. How may we assist you today?"
   }
 }
+
 
 
 
