@@ -1,98 +1,95 @@
-import os
-import json
-import requests
 from flask import Flask, request
-from shopify_utils import get_order_details_by_phone, format_order_summary
-from utils import match_faq_response
+import requests
+import json
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
-# Load environment variables
-VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
-WHATSAPP_TOKEN = os.getenv("WHATSAPP_TOKEN")
+ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
+VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
+WHATSAPP_API_URL = f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages"
 
-# Log env to verify they're loaded
-print("VERIFY_TOKEN:", VERIFY_TOKEN)
-print("WHATSAPP_TOKEN:", WHATSAPP_TOKEN[:4] + "..." if WHATSAPP_TOKEN else None)
-print("PHONE_NUMBER_ID:", PHONE_NUMBER_ID)
+# Load static FAQ from faq.json
+FAQ_FILE = "faq.json"
+faq = {}
+if os.path.exists(FAQ_FILE):
+    with open(FAQ_FILE, "r") as f:
+        faq = json.load(f)
+    print("✅ FAQ loaded:", list(faq.keys()))
+else:
+    print("❌ faq.json not found!")
 
-@app.route('/webhook', methods=['GET', 'POST'])
+# -------------------- Webhook Verification --------------------
+@app.route("/webhook", methods=["GET"])
+def verify():
+    mode = request.args.get("hub.mode")
+    token = request.args.get("hub.verify_token")
+    challenge = request.args.get("hub.challenge")
+    if mode == "subscribe" and token == VERIFY_TOKEN:
+        return challenge, 200
+    return "Verification failed", 403
+
+# -------------------- Webhook for WhatsApp Messages --------------------
+@app.route("/webhook", methods=["POST"])
 def webhook():
-    if request.method == 'GET':
-        mode = request.args.get("hub.mode")
-        token = request.args.get("hub.verify_token")
-        challenge = request.args.get("hub.challenge")
-        if mode == "subscribe" and token == VERIFY_TOKEN:
-            return challenge, 200
-        return "Verification failed", 403
+    data = request.get_json()
+    try:
+        message = data['entry'][0]['changes'][0]['value']['messages'][0]
+        user_id = message['from']
 
-    if request.method == 'POST':
-        data = request.get_json()
-        print("Incoming webhook payload:\n", json.dumps(data, indent=2))
+        if 'text' not in message:
+            print("⚠️ Ignoring non-text message.")
+            return "OK", 200
 
-        try:
-            changes = data['entry'][0]['changes'][0]['value']
-            messages = changes.get('messages')
-            if not messages:
-                print("No message found.")
-                return "no message", 200
+        user_text = message['text']['body'].lower().strip()
+        print("📩 Received message:", user_text)
 
-            message_data = messages[0]
-            phone_number = message_data['from'][-10:]
-            incoming_text = message_data.get('text', {}).get('body', "").lower()
-            print("Incoming text:", incoming_text)
+        # Match message with FAQ keywords
+        reply = match_faq(user_text)
 
-        except Exception as e:
-            print("Webhook parsing error:", e)
-            return "error", 200
-
-        # Match FAQ
-        faq_response = match_faq_response(incoming_text)
-        print("FAQ matched response:", faq_response)
-
-        if faq_response:
-            send_whatsapp_message(phone_number, faq_response)
+        if reply:
+            send_whatsapp_message(user_id, reply)
+            print("✅ Sent FAQ reply.")
         else:
-            # Fallback: Check Shopify
-            shopify_response = get_order_details_by_phone(phone_number)
-            print("Shopify response:", shopify_response)
+            send_whatsapp_message(user_id, "🙏 Sorry, I couldn’t find an answer to that. Please ask about consultation, products, or orders.")
+            print("⚠️ No FAQ match found.")
 
-            default_message = "We couldn't find any recent orders linked to this number. Please provide your order ID or contact support."
+    except Exception as e:
+        print("❌ Webhook error:", e)
 
-            try:
-                customers = shopify_response.get("data", {}).get("customers", {}).get("nodes", [])
-                orders = customers[0]["orders"]["nodes"] if customers else []
-                if orders:
-                    order_messages = [format_order_summary(order) for order in orders]
-                    default_message = "\n\n".join(order_messages)
-            except Exception as e:
-                print("Error parsing Shopify orders:", e)
+    return "OK", 200
 
-            send_whatsapp_message(phone_number, default_message)
+# -------------------- FAQ Matching Logic --------------------
+def match_faq(message):
+    for category, entry in faq.items():
+        if "keywords" in entry:
+            for keyword in entry["keywords"]:
+                if keyword.lower() in message:
+                    print(f"🔍 Matched keyword '{keyword}' in category '{category}'")
+                    return entry.get("response")
+    return None
 
-        return "ok", 200
-
-def send_whatsapp_message(phone_number, message):
+# -------------------- WhatsApp Send Function --------------------
+def send_whatsapp_message(to, message):
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
     payload = {
         "messaging_product": "whatsapp",
-        "to": f"91{phone_number}",
+        "to": to,
         "type": "text",
         "text": {"body": message}
     }
+    r = requests.post(WHATSAPP_API_URL, headers=headers, json=payload)
+    print("📬 WhatsApp API response:", r.status_code, r.text)
 
-    headers = {
-        "Authorization": f"Bearer {WHATSAPP_TOKEN}",
-        "Content-Type": "application/json"
-    }
-
-    url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
-    print("Sending message to:", phone_number)
-    print("Payload:", json.dumps(payload, indent=2))
-
-    response = requests.post(url, json=payload, headers=headers)
-    print("WhatsApp API Response:", response.status_code, response.text)
-
-if __name__ == '__main__':
+# -------------------- Run the Flask App --------------------
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
