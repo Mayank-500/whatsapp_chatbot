@@ -1,7 +1,7 @@
 import os
 import requests
 
-SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL")  # GraphQL endpoint
+SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL", "https://the-ayurveda-co.myshopify.com/admin/api/2023-10/graphql.json")
 SHOPIFY_ACCESS_TOKEN = os.getenv("SHOPIFY_ACCESS_TOKEN")
 
 
@@ -14,7 +14,7 @@ def get_order_details_by_phone(phone_number):
         {{
             customers(first: 10, query: "phone:+91{phone_number}") {{
                 nodes {{
-                    orders(first: 5, sortKey: CREATED_AT, reverse: true) {{
+                    orders(first: 10, sortKey: CREATED_AT, reverse: true) {{
                         nodes {{
                             name
                             createdAt
@@ -38,38 +38,22 @@ def get_order_details_by_phone(phone_number):
         "X-Shopify-Access-Token": SHOPIFY_ACCESS_TOKEN
     }
 
-    response = requests.post(SHOPIFY_STORE_URL, json=query, headers=headers)
-
     try:
+        response = requests.post(SHOPIFY_STORE_URL, json=query, headers=headers)
+        response.raise_for_status()
         return response.json()
     except Exception as e:
-        print(f"❌ Error parsing Shopify response: {e}")
-        return {"error": "Invalid JSON response"}
+        print(f"❌ Shopify API Error: {e}")
+        return {"error": "Failed to fetch orders from Shopify"}
 
 
 def format_order_summary(order):
     """
     Return a formatted string of a Shopify order for WhatsApp message.
     """
-    name = order.get("name")
-    status = order.get("displayFulfillmentStatus")
+    name = order.get("name", "Unknown")
+    status = order.get("displayFulfillmentStatus", "Unknown")
     items = order.get("lineItems", {}).get("nodes", [])
 
     item_lines = "\n".join([f"  - {item['title']} (x{item['quantity']})" for item in items])
-    return f"🧾 Order: {name}\n📦 Status: {status}\n🛍️ Items:\n{item_lines}"
-
-
-# Optional REST API call for future use
-def get_order_by_id_rest(order_id):
-    url = f"https://the-ayurveda-co.myshopify.com/admin/api/2024-04/orders/{order_id}.json"
-    headers = {
-        "X-Shopify-Access-Token": SHOPIFY_ACCESS_TOKEN
-    }
-
-    try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        return response.json()
-    except Exception as e:
-        print(f"❌ REST API Error for Order ID {order_id}: {e}")
-        return None
+    return f"🧾 Order: {name}\n📦 Status: {status}\n🛍️ Items:\n{item_lines or 'No items listed'}"
