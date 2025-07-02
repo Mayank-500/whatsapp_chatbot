@@ -1,12 +1,14 @@
 import os
 import requests
 
-SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL")  # Should be: https://the-ayurveda-co.myshopify.com/admin/api/2023-10/graphql.json
+# ✅ Make sure this is the full HTTPS URL
+SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL")
 SHOPIFY_ACCESS_TOKEN = os.getenv("SHOPIFY_ACCESS_TOKEN")
+
 
 def get_order_details_by_phone(phone_number):
     """
-    Fetch latest Shopify orders by phone number using GraphQL.
+    Fetch latest Shopify orders by phone number (GraphQL).
     """
     query = {
         "query": f"""
@@ -39,16 +41,13 @@ def get_order_details_by_phone(phone_number):
 
     try:
         response = requests.post(SHOPIFY_STORE_URL, json=query, headers=headers)
-        response.raise_for_status()
         return response.json()
     except Exception as e:
-        print(f"❌ Shopify API Error: {e}")
-        return {"error": str(e)}
+        print(f"❌ Shopify API error: {e}")
+        return {"error": "Request failed"}
+
 
 def format_order_summary(order):
-    """
-    Format order details for WhatsApp message.
-    """
     name = order.get("name")
     status = order.get("displayFulfillmentStatus")
     items = order.get("lineItems", {}).get("nodes", [])
