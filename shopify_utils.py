@@ -1,9 +1,9 @@
 import os
 import requests
 
-SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL")  # GraphQL endpoint
+# ✅ Corrected with "https://" schema and correct endpoint
+SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL", "https://the-ayurveda-co.myshopify.com/admin/api/2025-04/graphql.json")
 SHOPIFY_ACCESS_TOKEN = os.getenv("SHOPIFY_ACCESS_TOKEN")
-
 
 def get_order_details_by_phone(phone_number):
     """
@@ -46,7 +46,6 @@ def get_order_details_by_phone(phone_number):
         print(f"❌ Error parsing Shopify response: {e}")
         return {"error": "Invalid JSON response"}
 
-
 def format_order_summary(order):
     """
     Return a formatted string of a Shopify order for WhatsApp message.
@@ -58,8 +57,7 @@ def format_order_summary(order):
     item_lines = "\n".join([f"  - {item['title']} (x{item['quantity']})" for item in items])
     return f"🧾 Order: {name}\n📦 Status: {status}\n🛍️ Items:\n{item_lines}"
 
-
-# Optional REST API call for future use
+# Optional REST fallback (currently not used)
 def get_order_by_id_rest(order_id):
     url = f"https://the-ayurveda-co.myshopify.com/admin/api/2024-04/orders/{order_id}.json"
     headers = {

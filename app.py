@@ -8,7 +8,6 @@ app = Flask(__name__)
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN", "nishu")
 WHATSAPP_TOKEN = os.getenv("WHATSAPP_TOKEN")
 
-
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     if request.method == 'GET':
@@ -50,7 +49,6 @@ def webhook():
         send_whatsapp_message(phone_number, message_to_send)
         return "ok", 200
 
-
 def send_whatsapp_message(phone_number, message):
     payload = {
         "messaging_product": "whatsapp",
@@ -71,6 +69,8 @@ def send_whatsapp_message(phone_number, message):
     )
     print("📤 Sent to WhatsApp:", res.status_code, res.text)
 
-
+# ✅ This enables dynamic port binding for Render
 if __name__ == '__main__':
-    app.run(debug=False, port=10000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
