@@ -1,20 +1,19 @@
 import os
 import requests
 
-SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL", "https://the-ayurveda-co.myshopify.com/admin/api/2023-10/graphql.json")
+SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL")  # Should be: https://the-ayurveda-co.myshopify.com/admin/api/2023-10/graphql.json
 SHOPIFY_ACCESS_TOKEN = os.getenv("SHOPIFY_ACCESS_TOKEN")
-
 
 def get_order_details_by_phone(phone_number):
     """
-    Fetch latest Shopify orders by phone number (GraphQL).
+    Fetch latest Shopify orders by phone number using GraphQL.
     """
     query = {
         "query": f"""
         {{
             customers(first: 10, query: "phone:+91{phone_number}") {{
                 nodes {{
-                    orders(first: 10, sortKey: CREATED_AT, reverse: true) {{
+                    orders(first: 5, sortKey: CREATED_AT, reverse: true) {{
                         nodes {{
                             name
                             createdAt
@@ -44,16 +43,15 @@ def get_order_details_by_phone(phone_number):
         return response.json()
     except Exception as e:
         print(f"❌ Shopify API Error: {e}")
-        return {"error": "Failed to fetch orders from Shopify"}
-
+        return {"error": str(e)}
 
 def format_order_summary(order):
     """
-    Return a formatted string of a Shopify order for WhatsApp message.
+    Format order details for WhatsApp message.
     """
-    name = order.get("name", "Unknown")
-    status = order.get("displayFulfillmentStatus", "Unknown")
+    name = order.get("name")
+    status = order.get("displayFulfillmentStatus")
     items = order.get("lineItems", {}).get("nodes", [])
 
     item_lines = "\n".join([f"  - {item['title']} (x{item['quantity']})" for item in items])
-    return f"🧾 Order: {name}\n📦 Status: {status}\n🛍️ Items:\n{item_lines or 'No items listed'}"
+    return f"🧾 Order: {name}\n📦 Status: {status}\n🛍️ Items:\n{item_lines}"
