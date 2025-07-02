@@ -1,41 +1,42 @@
 {
   "greeting": {
     "keywords": ["hello", "hi", "namaste", "hey", "good morning", "good evening"],
-    "response": "🌿 Namaste! Welcome to The Ayurveda Co. — your trusted wellness partner. How may we assist your healing journey today?"
+    "response": "Namaste! Welcome to The Ayurveda Co. How may we assist you today?"
   },
   "consultation": {
     "keywords": ["consultation", "doctor", "naadi", "pulse check", "ayurvedic advice", "free advice"],
-    "response": "🧘‍♀️ Book your *free Naadi Pariksha* consultation with our Ayurvedic experts here 👉 https://theayurvedaco.com/pages/consultation"
+    "response": "Book your free Naadi Pariksha consultation with our Ayurvedic experts here: https://theayurvedaco.com/pages/consultation"
   },
   "products": {
     "keywords": ["product", "buy", "skin", "hair", "serum", "cream", "face wash", "recommend"],
-    "response": "🛍️ Discover our authentic Ayurvedic products crafted for holistic wellness 👉 https://theayurvedaco.com/collections/all-products"
+    "response": "Explore our Ayurvedic products for wellness: https://theayurvedaco.com/collections/all-products"
   },
   "order": {
     "keywords": ["order", "track", "status", "where is my order", "my order", "delivery", "shipping"],
-    "response": "📦 Let me quickly check your order status based on your WhatsApp number... Please hold on a moment."
+    "response": "Let me check your order status. Please wait while I fetch your details."
   },
   "support": {
     "keywords": ["wrong", "issue", "problem", "return", "refund", "help", "not received", "damaged", "complaint"],
-    "response": "😔 We're sorry to hear that. Please raise your concern with our support team here 👉 https://theayurvedaco.com/pages/contact-us"
+    "response": "Sorry to hear that. Please raise your concern here: https://theayurvedaco.com/pages/contact-us"
   },
   "thankyou": {
     "keywords": ["thank you", "thanks", "dhanyavaad", "shukriya"],
-    "response": "🙏 You’re most welcome! Wishing you good health and Ayurvedic happiness 🌿"
+    "response": "You're welcome! Wishing you good health and wellness."
   },
   "offers": {
     "keywords": ["offer", "discount", "coupon", "deal", "promo"],
-    "response": "🎁 Grab our latest Ayurvedic offers and discounts here 👉 https://theayurvedaco.com/pages/ongoing-offers"
+    "response": "Check our latest Ayurvedic offers: https://theayurvedaco.com/pages/ongoing-offers"
   },
   "ingredients": {
     "keywords": ["ingredients", "what's inside", "herbs", "natural"],
-    "response": "🌱 Our products are infused with potent Ayurvedic herbs. Explore the power of ingredients 👉 https://theayurvedaco.com/pages/ingredient-science"
+    "response": "Our products contain authentic Ayurvedic herbs. Learn more: https://theayurvedaco.com/pages/ingredient-science"
   },
   "subscription": {
     "keywords": ["subscribe", "membership", "auto", "reorder", "monthly"],
-    "response": "🔄 You can subscribe to your favourites and save more monthly! Check this 👉 https://theayurvedaco.com/pages/subscribe-and-save"
+    "response": "Subscribe and save on your favourite products: https://theayurvedaco.com/pages/subscribe-and-save"
   }
 }
+
 
 
 
