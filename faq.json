@@ -1,7 +1,23 @@
 {
   "greeting": {
-    "keywords": ["hello", "hi", "namaste", "hey", "good morning", "good evening"],
-    "response": "Namaste! Welcome to The Ayurveda Co. How may we assist you today?"
+    "keywords": ["hi", "hello", "namaste", "hey"],
+    "response": "Namaste 🙏 Welcome to TACX - The Ayurveda Co. 🌿 How may I assist you today?\nYou can reply with:\n1. Explore Products\n2. Book Consultation\n3. Track Order\n4. Ask a Health Question"
+  },
+  "explore products": {
+    "keywords": ["product", "products", "shop", "buy", "skin care", "ayurveda products"],
+    "response": "You can explore our Ayurveda-based wellness products here: https://tacx.in/shop"
+  },
+  "book consultation": {
+    "keywords": ["consult", "consultation", "doctor", "health advice", "book"],
+    "response": "You can book a free consultation with our Ayurveda experts: https://tacx.in/consult"
+  },
+  "track order": {
+    "keywords": ["track", "order", "status", "delivery"],
+    "response": "Track your TACX order here: https://tacx.in/track-order"
+  },
+  "support": {
+    "keywords": ["help", "support", "issue", "complaint"],
+    "response": "We're here to help. Please reach out via our support page: https://tacx.in/support"
   }
 }
 
