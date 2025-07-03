@@ -4,6 +4,8 @@ import json
 import os
 from dotenv import load_dotenv
 import openai
+import re
+from shopify_utils import fetch_order_status_by_phone
 
 # Load environment variables
 load_dotenv()
@@ -51,6 +53,13 @@ def webhook():
         user_text = message['text']['body'].lower()
         print("📩 Received message:", user_text)
 
+        # Step 0: Check if it contains a phone number for order tracking
+        phone = extract_phone_number(user_text)
+        if phone:
+            reply = fetch_order_status_by_phone(phone)
+            send_whatsapp_message(user_id, reply)
+            return "OK", 200
+
         # Step 1: Check static FAQ
         reply = check_faq(user_text)
         print("📚 FAQ reply:", reply)
@@ -81,6 +90,13 @@ def webhook():
     return "OK", 200
 
 # -------------------- Helper Functions --------------------
+
+def extract_phone_number(message):
+    """Extracts 10-digit phone number and returns in +91 format."""
+    match = re.search(r"\b\d{10}\b", message)
+    if match:
+        return "+91" + match.group()
+    return None
 
 def check_faq(message):
     for category, entry in faq.items():
