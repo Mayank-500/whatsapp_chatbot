@@ -1,23 +1,39 @@
 {
   "greeting": {
-    "keywords": ["hi", "hello", "namaste", "hey"],
+    "keywords": ["hi", "hello", "namaste", "hey", "good morning", "good evening", "good afternoon"],
     "response": "Namaste 🙏 Welcome to TACX - The Ayurveda Co. 🌿 How may I assist you today?\nYou can reply with:\n1. Explore Products\n2. Book Consultation\n3. Track Order\n4. Ask a Health Question"
   },
   "explore products": {
-    "keywords": ["product", "products", "shop", "buy", "skin care", "ayurveda products"],
-    "response": "You can explore our Ayurveda-based wellness products here: https://tacx.in/shop"
+    "keywords": ["product", "products", "shop", "buy", "skin care", "tacx store", "browse products", "available items", "skincare range", "hair care products"],
+    "response": "🌿 You can explore our Ayurveda-based wellness products here: https://theayurvedaco.com/collections/all"
   },
   "book consultation": {
-    "keywords": ["consult", "consultation", "doctor", "health advice", "book"],
-    "response": "You can book a free consultation with our Ayurveda experts: https://tacx.in/consult"
+    "keywords": ["consult", "consultation", "doctor", "health advice", "book", "talk to expert", "ayurveda doctor", "get advice"],
+    "response": "🧘 You can book a free consultation with our Ayurveda experts here: https://theayurvedaco.com/pages/consultation"
   },
   "track order": {
-    "keywords": ["track", "order", "status", "delivery"],
-    "response": "Track your TACX order here: https://tacx.in/track-order"
+    "keywords": ["track", "order", "status", "delivery", "where is my order", "order update", "shipping", "check order"],
+    "response": "📦 Track your TACX order here: https://theayurvedaco.com/apps/trackorder"
   },
   "support": {
-    "keywords": ["help", "support", "issue", "complaint"],
-    "response": "We're here to help. Please reach out via our support page: https://tacx.in/support"
+    "keywords": ["help", "support", "issue", "complaint", "problem", "contact", "get help"],
+    "response": "🛠️ We're here to help. Please reach out via our support page: https://theayurvedaco.com/pages/contact-us"
+  },
+  "offers": {
+    "keywords": ["offer", "discount", "sale", "deal", "promo", "coupon"],
+    "response": "🎁 Check out our latest offers and discounts here: https://theayurvedaco.com/pages/discounts"
+  },
+  "returns": {
+    "keywords": ["return", "refund", "cancel", "exchange"],
+    "response": "🔁 You can check our return & refund policy here: https://theayurvedaco.com/policies/refund-policy"
+  },
+  "ingredients": {
+    "keywords": ["ingredients", "herbs", "what's inside", "used in product", "formulation"],
+    "response": "🌿 Our products are crafted with authentic Ayurvedic herbs. Know more here: https://theayurvedaco.com/pages/ingredients"
+  },
+  "subscription": {
+    "keywords": ["subscribe", "subscription", "monthly box", "refill", "regular delivery"],
+    "response": "📦 You can subscribe for monthly wellness boxes here: https://theayurvedaco.com/pages/subscribe"
   }
 }
 
