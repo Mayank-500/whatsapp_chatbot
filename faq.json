@@ -11,7 +11,7 @@
     "keywords": ["consult", "consultation", "doctor", "health advice", "book", "talk to expert", "ayurveda doctor", "get advice"],
     "response": "🧘 You can book a free consultation with our Ayurveda experts here: https://theayurvedaco.com/pages/consultation"
   },
-  "track order": {
+  "track my order": {
     "keywords": ["track", "order", "status", "delivery", "where is my order", "order update", "shipping", "check order"],
     "response": "📦 Track your TACX order here: https://theayurvedaco.com/apps/trackorder"
   },
@@ -36,11 +36,4 @@
     "response": "📦 You can subscribe for monthly wellness boxes here: https://theayurvedaco.com/pages/subscribe"
   }
 }
-
-
-
-
-
-
-
 
