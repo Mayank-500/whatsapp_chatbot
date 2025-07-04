@@ -1,13 +1,44 @@
 {
-    "kumkumadi": "https://theayurvedaco.com/products/kumkumadi-face-scrub",
-    "ashwagandha": "https://theayurvedaco.com/products/ashwagandha-tablets",
-    "triphala": "https://theayurvedaco.com/products/triphala-tablets",
-    "neem": "https://theayurvedaco.com/products/neem-anti-acne-face-wash",
-    "turmeric": "https://theayurvedaco.com/products/turmeric-clay-mask",
-    "brahmi": "https://theayurvedaco.com/products/brahmi-hair-oil",
-    "manjishtha": "https://theayurvedaco.com/products/manjishtha-detox-tea",
-    "hair fall": "https://theayurvedaco.com/collections/hair-care",
-    "hyperpigmentation": "https://theayurvedaco.com/collections/face-care",
-    "immunity booster": "https://theayurvedaco.com/products/immunity-booster-tablets"
+    "kumkumadi": {
+      "product": "Kumkumadi Face Scrub",
+      "link": "https://tacx.in/products/kumkumadi-face-scrub"
+    },
+    "hair oil": {
+      "product": "Methi Bhringraj Hair Oil",
+      "link": "https://tacx.in/products/methi-bhringraj-hair-oil"
+    },
+    "gut health": {
+      "product": "Digestive Wellness Tablets",
+      "link": "https://tacx.in/products/gut-wellness-ayurvedic-tablets"
+    },
+    "ashwagandha": {
+      "product": "Ashwagandha Capsules",
+      "link": "https://tacx.in/products/ashwagandha-tablets"
+    },
+    "ubtan": {
+      "product": "Ubtan Face Wash",
+      "link": "https://tacx.in/products/ubtan-foaming-face-wash"
+    },
+    "nalpamaradi": {
+      "product": "Nalpamaradi Thailam",
+      "link": "https://tacx.in/products/nalpamaradi-thailam-body-oil"
+    },
+    "eladi": {
+      "product": "Eladi Day Cream",
+      "link": "https://tacx.in/products/eladi-day-cream"
+    },
+    "chyawanprash": {
+      "product": "TACX Chyawanprash",
+      "link": "https://tacx.in/products/ayurvedic-chyawanprash"
+    },
+    "sleep": {
+      "product": "Sleep Support Capsules",
+      "link": "https://tacx.in/products/sleep-support-capsules"
+    },
+    "rash": {
+      "product": "Anti-Rash Cream for Babies",
+      "link": "https://tacx.in/products/anti-rash-cream"
+    }
   }
+  
   

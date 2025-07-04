@@ -1,39 +1,46 @@
 {
   "greeting": {
-    "keywords": ["hi", "hello", "namaste", "hey", "good morning", "good evening", "good afternoon"],
+    "keywords": ["hi", "hello", "namaste", "hey", "good morning", "good evening", "good night"],
     "response": "Namaste 🙏 Welcome to TACX - The Ayurveda Co. 🌿 How may I assist you today?\nYou can reply with:\n1. Explore Products\n2. Book Consultation\n3. Track Order\n4. Ask a Health Question"
   },
   "explore products": {
-    "keywords": ["product", "products", "shop", "buy", "skin care", "tacx store", "browse products", "available items", "skincare range", "hair care products"],
-    "response": "🌿 You can explore our Ayurveda-based wellness products here: https://theayurvedaco.com/collections/all"
+    "keywords": ["product", "products", "shop", "buy", "skin care", "ayurveda products", "recommend"],
+    "response": "You can explore our Ayurveda-based wellness products here: https://tacx.in/shop"
   },
   "book consultation": {
-    "keywords": ["consult", "consultation", "doctor", "health advice", "book", "talk to expert", "ayurveda doctor", "get advice"],
-    "response": "🧘 You can book a free consultation with our Ayurveda experts here: https://theayurvedaco.com/pages/consultation"
+    "keywords": ["consult", "consultation", "doctor", "health advice", "talk to expert", "book appointment"],
+    "response": "You can book a free consultation with our Ayurveda experts: https://tacx.in/consult"
   },
-  "track my order": {
-    "keywords": ["track", "order", "status", "delivery", "where is my order", "order update", "shipping", "check order"],
-    "response": "📦 Track your TACX order here: https://theayurvedaco.com/apps/trackorder"
+  "track order": {
+    "keywords": ["track", "order", "status", "delivery", "where is my order", "check my order"],
+    "response": "Track your TACX order here: https://tacx.in/track-order"
   },
   "support": {
-    "keywords": ["help", "support", "issue", "complaint", "problem", "contact", "get help"],
-    "response": "🛠️ We're here to help. Please reach out via our support page: https://theayurvedaco.com/pages/contact-us"
+    "keywords": ["help", "support", "issue", "complaint", "problem", "feedback"],
+    "response": "We're here to help. Please raise your complaint here: https://tacx.in/support"
   },
-  "offers": {
-    "keywords": ["offer", "discount", "sale", "deal", "promo", "coupon"],
-    "response": "🎁 Check out our latest offers and discounts here: https://theayurvedaco.com/pages/discounts"
+  "return policy": {
+    "keywords": ["return", "refund", "exchange", "cancel order", "money back"],
+    "response": "Read our return and refund policy here: https://tacx.in/return-policy"
   },
-  "returns": {
-    "keywords": ["return", "refund", "cancel", "exchange"],
-    "response": "🔁 You can check our return & refund policy here: https://theayurvedaco.com/policies/refund-policy"
+  "offers and discounts": {
+    "keywords": ["offer", "discount", "coupon", "deal", "sale", "promo code"],
+    "response": "Check out our latest offers and bundles here: https://tacx.in/collections/combo-offers"
   },
-  "ingredients": {
-    "keywords": ["ingredients", "herbs", "what's inside", "used in product", "formulation"],
-    "response": "🌿 Our products are crafted with authentic Ayurvedic herbs. Know more here: https://theayurvedaco.com/pages/ingredients"
+  "about the ayurveda co": {
+    "keywords": ["about", "who are you", "company info", "the ayurveda co", "tacx", "ayurveda co"],
+    "response": "We are TACX - The Ayurveda Co. 🌿 Blending ancient ayurvedic wisdom with modern science. Learn more: https://tacx.in/pages/about-us"
   },
-  "subscription": {
-    "keywords": ["subscribe", "subscription", "monthly box", "refill", "regular delivery"],
-    "response": "📦 You can subscribe for monthly wellness boxes here: https://theayurvedaco.com/pages/subscribe"
+  "haircare solutions": {
+    "keywords": ["hair", "haircare", "hair fall", "hair oil", "shampoo"],
+    "response": "Check out our Ayurvedic haircare products: https://tacx.in/collections/hair-care"
+  },
+  "skincare range": {
+    "keywords": ["skin", "skincare", "acne", "glow", "kumkumadi", "face wash"],
+    "response": "Explore our skincare products here: https://tacx.in/collections/skin-care"
+  },
+  "wellness and supplements": {
+    "keywords": ["immunity", "wellness", "energy", "supplement", "chyawanprash", "gut health"],
+    "response": "Explore wellness & immunity products: https://tacx.in/collections/wellness"
   }
 }
-
