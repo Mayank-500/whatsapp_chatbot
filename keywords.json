@@ -1,17 +1,8 @@
 {
-  "kumkumadi": ["kumkumadi", "kumkumadi oil", "kumkumadi face scrub", "benefits of kumkumadi"],
-  "bhringraj": ["bhringraj", "bhringraj oil", "hair fall", "hair loss"],
-  "amla": ["amla", "amla oil", "hair cleanser", "vitamin c"],
-  "ubtan": ["ubtan", "ubtan face wash", "natural scrub", "glow"],
-  "glow serum": ["glow serum", "brightening serum", "face serum"],
-  "ashwagandha": ["ashwagandha", "immunity", "stress", "energy"],
-  "neem": ["neem", "anti-acne", "antibacterial", "face cleanser"],
-  "dosha": ["vata", "pitta", "kapha", "dosha", "body type"],
-  "face scrub": ["scrub", "face exfoliator", "clean face", "glowing skin"],
-  "skin care": ["skin", "skincare", "clear skin", "natural skin glow"],
-  "joint pain": ["joint pain", "pain relief", "joint oil"],
-  "turmeric": ["turmeric", "haldi", "anti-inflammatory", "skin"],
-  "face oil": ["face oil", "glow oil", "hydrating oil"],
-  "recommend": ["recommend", "suggest product", "best product", "suggestion"]
+  "kumkumadi": ["kumkumadi", "kumkumadi oil", "benefits of kumkumadi", "kumkumadi serum"],
+  "face care": ["face scrub", "face wash", "face oil", "ayurvedic face cream"],
+  "hair care": ["hair oil", "hair fall", "hair serum", "natural shampoo"],
+  "body care": ["body lotion", "body butter", "skin nourishment"],
+  "wellness": ["immunity", "health tips", "wellness routine", "natural remedies", "herbal supplement"],
+  "science": ["modern science", "ancient wisdom", "ayurveda and science", "blend", "formulation"]
 }
-

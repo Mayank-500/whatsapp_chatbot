@@ -1,32 +1,30 @@
 {
   "greeting": {
     "keywords": ["hi", "hello", "namaste", "hey"],
-    "response": "Namaste. Welcome to TACX - The Ayurveda Co. How may I assist you today?\nYou can reply with:\n1. Explore Products\n2. Book Consultation\n3. Track Order\n4. Ask a Health Question"
-  },
-  "explore products": {
-    "keywords": ["product", "products", "shop", "buy", "skin care", "ayurveda products"],
-    "response": "You can explore our Ayurveda-based wellness products here: https://tacx.in/shop"
-  },
-  "book consultation": {
-    "keywords": ["consult", "consultation", "doctor", "health advice", "book"],
-    "response": "Book a free consultation with our Ayurveda experts: https://tacx.in/consult"
+    "response": "Namaste. Welcome to TACX - The Ayurveda Co. How may I assist you today?\n1. Explore Products\n2. Book Consultation\n3. Track Order\n4. Ask a Health Question"
   },
   "track order": {
-    "keywords": ["track", "order", "status", "delivery"],
+    "keywords": ["track", "order", "delivery", "status"],
     "response": "Track your TACX order here: https://tacx.in/track-order"
   },
-  "support": {
-    "keywords": ["help", "support", "issue", "complaint", "refund", "policy"],
-    "response": "We're here to help. Please raise your concern here: https://tacx.in/support"
+  "consultation": {
+    "keywords": ["consult", "consultation", "book doctor", "talk to expert"],
+    "response": "You can book a free consultation with our Ayurveda experts here: https://tacx.in/consult"
+  },
+  "products": {
+    "keywords": ["product", "shop", "buy", "ayurvedic items"],
+    "response": "Explore our products: https://tacx.in/shop"
   },
   "offers": {
-    "keywords": ["offer", "discount", "deal", "combo"],
-    "response": "Check out our latest offers and bundles here: https://tacx.in/collections/combo-offers"
+    "keywords": ["offer", "discount", "coupon", "deal"],
+    "response": "Check out our latest offers and combos: https://tacx.in/collections/combo-offers"
+  },
+  "support": {
+    "keywords": ["support", "help", "refund", "issue", "complaint"],
+    "response": "We’re here to help: https://tacx.in/support"
   },
   "about": {
-    "keywords": ["who are you", "about company", "ayurveda co", "brand"],
-    "response": "We are TACX - The Ayurveda Co. Blending ancient ayurvedic wisdom with modern science. Learn more: https://tacx.in/pages/about-us"
+    "keywords": ["who are you", "your company", "about", "what is tacx"],
+    "response": "We are TACX - The Ayurveda Co. Learn more: https://tacx.in/pages/about-us"
   }
 }
-
-

@@ -1,18 +1,10 @@
 {
-    "kumkumadi": "https://tacx.in/products/kumkumadi-face-scrub",
-    "bhringraj": "https://tacx.in/products/bhringraj-hair-oil",
-    "amla": "https://tacx.in/products/amla-hair-cleanser",
-    "ubtan": "https://tacx.in/products/ubtan-face-wash",
-    "glow serum": "https://tacx.in/products/glow-serum",
-    "ashwagandha": "https://tacx.in/products/ashwagandha-capsules",
-    "neem": "https://tacx.in/products/neem-face-cleanser",
-    "dosha": "https://tacx.in/blogs/learn/understanding-doshas-in-ayurveda",
-    "face scrub": "https://tacx.in/products/kumkumadi-face-scrub",
-    "skin care": "https://tacx.in/collections/skin-care",
-    "joint pain": "https://tacx.in/products/joint-pain-relief-oil",
-    "turmeric": "https://tacx.in/products/turmeric-glow-pack",
-    "face oil": "https://tacx.in/collections/skin-care",
-    "recommend": "https://tacx.in/collections/all"
+    "kumkumadi": "https://tacx.in/products/kumkumadi-oil",
+    "face care": "https://tacx.in/collections/skin-care",
+    "hair care": "https://tacx.in/collections/hair-care",
+    "body care": "https://tacx.in/collections/body-care",
+    "wellness": "https://tacx.in/collections/wellness",
+    "science": "https://tacx.in/pages/about-us"
   }
   
   
