@@ -3,28 +3,28 @@
     "keywords": ["hi", "hello", "namaste", "hey"],
     "response": "Namaste. Welcome to TACX - The Ayurveda Co. How may I assist you today?\n1. Explore Products\n2. Book Consultation\n3. Track Order\n4. Ask a Health Question"
   },
-  "track order": {
-    "keywords": ["track", "order", "delivery", "status"],
-    "response": "Track your TACX order here: https://tacx.in/track-order"
-  },
-  "consultation": {
-    "keywords": ["consult", "consultation", "book doctor", "talk to expert"],
-    "response": "You can book a free consultation with our Ayurveda experts here: https://tacx.in/consult"
-  },
-  "products": {
-    "keywords": ["product", "shop", "buy", "ayurvedic items"],
+  "explore products": {
+    "keywords": ["product", "products", "shop", "buy", "ayurveda products"],
     "response": "Explore our products: https://tacx.in/shop"
   },
-  "offers": {
-    "keywords": ["offer", "discount", "coupon", "deal"],
-    "response": "Check out our latest offers and combos: https://tacx.in/collections/combo-offers"
+  "consultation": {
+    "keywords": ["consult", "consultation", "doctor", "health advice"],
+    "response": "Book a consultation: https://tacx.in/consult"
+  },
+  "track order": {
+    "keywords": ["track", "order", "status", "delivery"],
+    "response": "Track your TACX order here: https://tacx.in/track-order"
   },
   "support": {
-    "keywords": ["support", "help", "refund", "issue", "complaint"],
-    "response": "We’re here to help: https://tacx.in/support"
+    "keywords": ["help", "support", "issue", "complaint", "refund", "return", "policy"],
+    "response": "We're here to help: https://tacx.in/support"
+  },
+  "offers": {
+    "keywords": ["offer", "discount", "coupon", "bundle"],
+    "response": "Check out our latest offers: https://tacx.in/collections/combo-offers"
   },
   "about": {
-    "keywords": ["who are you", "your company", "about", "what is tacx"],
+    "keywords": ["who are you", "your company", "about tacx"],
     "response": "We are TACX - The Ayurveda Co. Learn more: https://tacx.in/pages/about-us"
   }
 }

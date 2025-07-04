@@ -1,8 +1,9 @@
 {
-  "kumkumadi": ["kumkumadi", "kumkumadi oil", "benefits of kumkumadi", "kumkumadi serum"],
-  "face care": ["face scrub", "face wash", "face oil", "ayurvedic face cream"],
-  "hair care": ["hair oil", "hair fall", "hair serum", "natural shampoo"],
-  "body care": ["body lotion", "body butter", "skin nourishment"],
-  "wellness": ["immunity", "health tips", "wellness routine", "natural remedies", "herbal supplement"],
-  "science": ["modern science", "ancient wisdom", "ayurveda and science", "blend", "formulation"]
+  "kumkumadi": ["kumkumadi", "kumkumadi oil", "kumkumadi benefits", "kumkumadi face oil"],
+  "ashwagandha": ["ashwagandha", "sleep", "stress relief", "immunity booster"],
+  "skin care": ["face oil", "face scrub", "skin care", "glow", "ayurvedic skincare"],
+  "hair care": ["hair oil", "hair fall", "hair growth", "scalp"],
+  "digestive health": ["digestion", "gas", "bloating", "gut health", "triphala"],
+  "women wellness": ["pcos", "menstrual", "hormonal", "women care"],
+  "ancient science": ["vedic", "ancient wisdom", "ayurvedic tradition", "vedic rituals"]
 }
