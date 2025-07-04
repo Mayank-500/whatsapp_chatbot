@@ -1,15 +1,17 @@
 {
-  "ayurvedic skincare": ["kumkumadi", "face oil", "skin glow", "dark spots", "hyperpigmentation", "glow", "clear skin", "ayurvedic face", "natural face"],
-  "hair wellness": ["hair fall", "hair oil", "scalp", "dandruff", "growth", "split ends", "natural shampoo"],
-  "gut health": ["digestion", "acidity", "constipation", "bloating", "gut cleanse", "ayurvedic digestion"],
-  "immunity booster": ["immunity", "cold", "flu", "energy", "fatigue", "boost health", "resistance"],
-  "women health": ["period", "pcos", "fertility", "hormones", "cycle", "pain relief"],
-  "men wellness": ["stress", "fatigue", "energy boost", "performance", "masculine health"],
-  "lifestyle ayurveda": ["routine", "daily care", "detox", "ayurvedic living", "ritual", "dincharya"],
-  "ayurvedic beauty": ["beauty", "natural glow", "chemical-free", "herbal face", "scrub", "face mask"],
-  "mental wellness": ["anxiety", "sleep", "focus", "calm", "relaxation", "ashwagandha", "brahmi"],
-  "baby care": ["baby", "baby oil", "rash", "diaper", "baby skin", "gentle care"],
-  "modern ayurveda": ["science", "clinical", "proven", "efficacy", "tested", "modern ayurveda"],
-  "traditional herbs": ["turmeric", "tulsi", "ashwagandha", "brahmi", "giloy", "neem", "aloe vera"],
-  "product names": ["kumkumadi", "tacx oil", "face scrub", "rash cream", "eladi", "nalpamaradi", "ubtan"]
+  "kumkumadi": ["kumkumadi", "kumkumadi oil", "kumkumadi face scrub", "benefits of kumkumadi"],
+  "bhringraj": ["bhringraj", "bhringraj oil", "hair fall", "hair loss"],
+  "amla": ["amla", "amla oil", "hair cleanser", "vitamin c"],
+  "ubtan": ["ubtan", "ubtan face wash", "natural scrub", "glow"],
+  "glow serum": ["glow serum", "brightening serum", "face serum"],
+  "ashwagandha": ["ashwagandha", "immunity", "stress", "energy"],
+  "neem": ["neem", "anti-acne", "antibacterial", "face cleanser"],
+  "dosha": ["vata", "pitta", "kapha", "dosha", "body type"],
+  "face scrub": ["scrub", "face exfoliator", "clean face", "glowing skin"],
+  "skin care": ["skin", "skincare", "clear skin", "natural skin glow"],
+  "joint pain": ["joint pain", "pain relief", "joint oil"],
+  "turmeric": ["turmeric", "haldi", "anti-inflammatory", "skin"],
+  "face oil": ["face oil", "glow oil", "hydrating oil"],
+  "recommend": ["recommend", "suggest product", "best product", "suggestion"]
 }
+

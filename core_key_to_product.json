@@ -1,44 +1,18 @@
 {
-    "kumkumadi": {
-      "product": "Kumkumadi Face Scrub",
-      "link": "https://tacx.in/products/kumkumadi-face-scrub"
-    },
-    "hair oil": {
-      "product": "Methi Bhringraj Hair Oil",
-      "link": "https://tacx.in/products/methi-bhringraj-hair-oil"
-    },
-    "gut health": {
-      "product": "Digestive Wellness Tablets",
-      "link": "https://tacx.in/products/gut-wellness-ayurvedic-tablets"
-    },
-    "ashwagandha": {
-      "product": "Ashwagandha Capsules",
-      "link": "https://tacx.in/products/ashwagandha-tablets"
-    },
-    "ubtan": {
-      "product": "Ubtan Face Wash",
-      "link": "https://tacx.in/products/ubtan-foaming-face-wash"
-    },
-    "nalpamaradi": {
-      "product": "Nalpamaradi Thailam",
-      "link": "https://tacx.in/products/nalpamaradi-thailam-body-oil"
-    },
-    "eladi": {
-      "product": "Eladi Day Cream",
-      "link": "https://tacx.in/products/eladi-day-cream"
-    },
-    "chyawanprash": {
-      "product": "TACX Chyawanprash",
-      "link": "https://tacx.in/products/ayurvedic-chyawanprash"
-    },
-    "sleep": {
-      "product": "Sleep Support Capsules",
-      "link": "https://tacx.in/products/sleep-support-capsules"
-    },
-    "rash": {
-      "product": "Anti-Rash Cream for Babies",
-      "link": "https://tacx.in/products/anti-rash-cream"
-    }
+    "kumkumadi": "https://tacx.in/products/kumkumadi-face-scrub",
+    "bhringraj": "https://tacx.in/products/bhringraj-hair-oil",
+    "amla": "https://tacx.in/products/amla-hair-cleanser",
+    "ubtan": "https://tacx.in/products/ubtan-face-wash",
+    "glow serum": "https://tacx.in/products/glow-serum",
+    "ashwagandha": "https://tacx.in/products/ashwagandha-capsules",
+    "neem": "https://tacx.in/products/neem-face-cleanser",
+    "dosha": "https://tacx.in/blogs/learn/understanding-doshas-in-ayurveda",
+    "face scrub": "https://tacx.in/products/kumkumadi-face-scrub",
+    "skin care": "https://tacx.in/collections/skin-care",
+    "joint pain": "https://tacx.in/products/joint-pain-relief-oil",
+    "turmeric": "https://tacx.in/products/turmeric-glow-pack",
+    "face oil": "https://tacx.in/collections/skin-care",
+    "recommend": "https://tacx.in/collections/all"
   }
   
   
