@@ -4,8 +4,9 @@ import json
 import os
 import re
 from dotenv import load_dotenv
+
 from shopify_utils import fetch_order_status_by_phone
-from openai_handler import is_domain_specific, generate_openai_response
+from gemini_handler import ask_gemini
 
 # Load environment variables
 load_dotenv()
@@ -24,6 +25,7 @@ if os.path.exists(FAQ_FILE):
     with open(FAQ_FILE, "r") as f:
         faq = json.load(f)
 
+# -------------------- Webhook Verification --------------------
 @app.route("/webhook", methods=["GET"])
 def verify():
     mode = request.args.get("hub.mode")
@@ -33,6 +35,7 @@ def verify():
         return challenge, 200
     return "Verification failed", 403
 
+# -------------------- Webhook for WhatsApp Messages --------------------
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
@@ -47,28 +50,34 @@ def webhook():
         user_text = message['text']['body'].lower()
         print("📩 Received message:", user_text)
 
+        # 1. Check for phone number → Shopify Order Lookup
         phone = extract_phone_number(user_text)
         if phone:
             reply = fetch_order_status_by_phone(phone)
             send_whatsapp_message(user_id, reply)
             return "OK", 200
 
+        # 2. Check FAQ
         reply = check_faq(user_text)
         if reply:
             send_whatsapp_message(user_id, reply)
-        elif is_domain_specific(user_text):
-            print("🧠 Using OpenAI for domain-specific query:", user_text)
-            openai_reply = generate_openai_response(user_text)
-            print("🧠 OpenAI response:", openai_reply)
-            send_whatsapp_message(user_id, openai_reply)
-        else:
-            send_whatsapp_message(user_id, "🙏 Sorry, I didn't understand. Please ask about consultation, Ayurveda, or order status.")
+            return "OK", 200
+
+        # 3. Check Gemini
+        reply = ask_gemini(user_text)
+        if reply:
+            send_whatsapp_message(user_id, reply)
+            return "OK", 200
+
+        # 4. Fallback
+        send_whatsapp_message(user_id, "🙏 Sorry, I didn't understand. Please ask about consultation, products, or orders.")
 
     except Exception as e:
         print("❌ Webhook error:", e)
 
     return "OK", 200
 
+# -------------------- Helper Functions --------------------
 def extract_phone_number(message):
     match = re.search(r"\b\d{10}\b", message)
     if match:
@@ -76,7 +85,7 @@ def extract_phone_number(message):
     return None
 
 def check_faq(message):
-    for _, entry in faq.items():
+    for category, entry in faq.items():
         if isinstance(entry, dict) and "keywords" in entry:
             for keyword in entry["keywords"]:
                 if keyword.lower() in message:
@@ -96,7 +105,7 @@ def send_whatsapp_message(to, message):
     r = requests.post(WHATSAPP_API_URL, headers=headers, json=payload)
     print("✅ Message sent:", r.status_code, r.text)
 
+# -------------------- Start Flask App --------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
-
