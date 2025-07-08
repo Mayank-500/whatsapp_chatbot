@@ -1,53 +1,39 @@
-import os
 import requests
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
-SHOPIFY_API_URL = os.getenv("SHOPIFY_API_URL")
-SHOPIFY_ACCESS_TOKEN = os.getenv("SHOPIFY_ACCESS_TOKEN")
 
-HEADERS = {
-    "Content-Type": "application/json",
-    "X-Shopify-Access-Token": SHOPIFY_ACCESS_TOKEN
-}
+SHOPIFY_STORE_DOMAIN = os.getenv("SHOPIFY_STORE_DOMAIN")  # e.g., tacx.myshopify.com
+SHOPIFY_ACCESS_TOKEN = os.getenv("SHOPIFY_ACCESS_TOKEN")  # Admin API access token
 
-QUERY_TEMPLATE = """
-query {
-  customers(first: 10, query: "phone:%s") {
-    nodes {
-      firstName
-      orders(first: 1, reverse: true) {
-        nodes {
-          name
-          displayFulfillmentStatus
-        }
-      }
-    }
-  }
-}
-"""
-
-def fetch_order_status_by_phone(phone):
+def fetch_order_status_by_phone(phone_number):
     try:
-        query = QUERY_TEMPLATE % phone
-        response = requests.post(
-            SHOPIFY_API_URL,
-            headers=HEADERS,
-            json={"query": query}
-        )
-        data = response.json()
-        customers = data.get("data", {}).get("customers", {}).get("nodes", [])
-        if not customers:
-            return "No customer found with this phone number."
+        url = f"https://{SHOPIFY_STORE_DOMAIN}/admin/api/2023-07/orders.json?status=any&fields=id,name,phone,financial_status,fulfillment_status"
 
-        orders = customers[0].get("orders", {}).get("nodes", [])
-        if not orders:
-            return "No recent orders found for this number."
+        headers = {
+            "Content-Type": "application/json",
+            "X-Shopify-Access-Token": SHOPIFY_ACCESS_TOKEN
+        }
 
-        latest = orders[0]
-        return f"Order {latest['name']} is currently: {latest['displayFulfillmentStatus']}."
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        orders = response.json().get("orders", [])
+
+        matched_orders = [order for order in orders if order.get("phone", "").endswith(phone_number)]
+
+        if not matched_orders:
+            return "⚠️ No orders found for this phone number. Please check and try again."
+
+        latest_order = matched_orders[0]  # Optional: Use latest order if multiple match
+        order_id = latest_order.get("name", "Unknown")
+        fulfillment_status = latest_order.get("fulfillment_status", "Unfulfilled").upper()
+
+        return f"📦 Order {order_id} is currently: {fulfillment_status}."
+
+    except requests.exceptions.RequestException as e:
+        print(f"[Shopify API Error] {str(e)}")
+        return "❌ Could not connect to Shopify. Please try again later."
     except Exception as e:
-        print("Shopify error:", e)
-        return "Could not fetch order. Try again later."
-
-
+        print(f"[fetch_order_status_by_phone Error] {str(e)}")
+        return "⚠️ Unexpected error while fetching order status."
