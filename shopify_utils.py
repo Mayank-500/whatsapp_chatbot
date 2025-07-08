@@ -46,7 +46,7 @@ def fetch_order_status_by_phone(phone):
 
         latest = orders[0]
         return f"Order {latest['name']} is currently: {latest['displayFulfillmentStatus']}."
-
     except Exception as e:
         print("Shopify error:", e)
         return "Could not fetch order. Try again later."
+
