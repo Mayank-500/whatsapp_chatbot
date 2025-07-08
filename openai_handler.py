@@ -1,11 +1,12 @@
 import openai
 import os
-import traceback
 from dotenv import load_dotenv
+from openai import OpenAI
+import traceback
 
 load_dotenv()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 ALLOWED_KEYWORDS = [
     "ayurveda", "dosha", "kapha", "pitta", "vata", "prakriti", "nadi", "consultation",
@@ -19,7 +20,7 @@ def is_domain_specific(question: str) -> bool:
 
 def generate_openai_response(user_message: str) -> str:
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are an expert Ayurveda consultant. Answer in simple and helpful language."},
@@ -27,7 +28,7 @@ def generate_openai_response(user_message: str) -> str:
             ],
             temperature=0.6
         )
-        return response['choices'][0]['message']['content'].strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         print("❌ OpenAI API Error:", e)
         traceback.print_exc()
