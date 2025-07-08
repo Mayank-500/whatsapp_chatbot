@@ -139,3 +139,155 @@ def get_openai_response(msg):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+from flask import Flask, request
+import requests, json, os, re
+from dotenv import load_dotenv
+import openai
+
+from shopify_utils import fetch_order_status_by_phone
+
+# Load environment variables
+load_dotenv()
+app = Flask(__name__)
+
+ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
+PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
+VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+WHATSAPP_API_URL = f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages"
+openai.api_key = OPENAI_API_KEY
+
+# ✅ Sanity check for .env values
+print("\n✅ .env status check:")
+print("OPENAI_API_KEY exists:", bool(OPENAI_API_KEY))
+print("WHATSAPP_API_URL:", WHATSAPP_API_URL)
+
+# ✅ Load JSON files
+try:
+    faq = json.load(open("faq.json"))
+    keyword_data = json.load(open("keyword.json"))
+    core_key_map = json.load(open("core_key_to_product.json"))
+    print("✅ All JSON files loaded successfully.")
+except Exception as e:
+    print("❌ Error loading JSON files:", e)
+    faq, keyword_data, core_key_map = {}, {}, {}
+
+# ✅ Webhook verification
+@app.route("/webhook", methods=["GET"])
+def verify():
+    mode = request.args.get("hub.mode")
+    token = request.args.get("hub.verify_token")
+    challenge = request.args.get("hub.challenge")
+    if mode == "subscribe" and token == VERIFY_TOKEN:
+        return challenge, 200
+    return "Verification failed", 403
+
+# ✅ Webhook handler
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    data = request.get_json()
+    print("\n💬 Incoming webhook payload:", json.dumps(data, indent=2))
+
+    try:
+        message = data['entry'][0]['changes'][0]['value']['messages'][0]
+        user_id = message['from']
+
+        if 'text' not in message:
+            return "OK", 200
+
+        user_text = message['text']['body'].lower()
+        print("📥 User message:", user_text)
+
+        # Step 1: Phone number check
+        phone = extract_phone_number(user_text)
+        if phone:
+            print("📞 Phone detected:", phone)
+            reply = fetch_order_status_by_phone(phone)
+            return send_reply(user_id, reply)
+
+        # Step 2: FAQ check
+        reply = check_faq(user_text)
+        if reply:
+            print("📚 FAQ match found")
+            return send_reply(user_id, reply)
+
+        # Step 3: Keyword → GPT → Product
+        core_key = match_keyword_to_core_key(user_text)
+        if core_key:
+            print("🔑 Core keyword:", core_key)
+            gpt_reply = get_openai_response(user_text)
+            product_url = core_key_map.get(core_key, "")
+            reply = f"{gpt_reply}\n\n🌿 Recommended for you: {product_url}"
+            return send_reply(user_id, reply)
+
+        # Step 4: Fallback
+        print("⚠️ No match found, sending fallback.")
+        return send_reply(user_id, "I'm still learning. Please ask about our Ayurveda products, consultations or orders.")
+
+    except Exception as e:
+        print("🔥 ERROR in /webhook:", repr(e))
+        return "Error", 500
+
+# ✅ Extract phone number from message
+def extract_phone_number(msg):
+    match = re.search(r"\b\d{10}\b", msg)
+    return "+91" + match.group() if match else None
+
+# ✅ Send WhatsApp reply
+def send_reply(user_id, text):
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": user_id,
+        "text": {"body": text}
+    }
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    r = requests.post(WHATSAPP_API_URL, headers=headers, json=payload)
+    print("📤 Reply sent. Status code:", r.status_code)
+    return "OK", 200
+
+# ✅ Match FAQ
+def check_faq(msg):
+    for category, entry in faq.items():
+        for keyword in entry.get("keywords", []):
+            if keyword.lower() in msg:
+                return entry.get("response")
+    return None
+
+# ✅ Match keyword to core category
+def match_keyword_to_core_key(msg):
+    for core_key, keywords in keyword_data.items():
+        for kw in keywords:
+            if kw.lower() in msg:
+                return core_key
+    return None
+
+# ✅ Get OpenAI response
+def get_openai_response(msg):
+    prompt = f"Act as an Ayurveda expert. Answer briefly:\n\nQ: {msg}\nA:"
+    try:
+        print("📤 Sending prompt to OpenAI:", prompt)
+        response = openai.ChatCompletion.create(
+            model="gpt-4o",  # or try "gpt-3.5-turbo"
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+            max_tokens=100
+        )
+        print("✅ OpenAI full response:", response)
+        answer = response.choices[0].message['content'].strip()
+        return answer
+    except Exception as e:
+        print("❌ OpenAI API error:", repr(e))
+        return "Our expert will get back to you soon."
+
+# ✅ Test endpoint (local only)
+@app.route("/test-gpt", methods=["GET"])
+def test_gpt():
+    return get_openai_response("What are the benefits of Ashwagandha?")
+
+# ✅ Run the app
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
