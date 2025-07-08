@@ -21,7 +21,7 @@ def is_domain_specific(question: str) -> bool:
 def generate_openai_response(user_message: str) -> str:
     try:
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-3.5-turbo",  # ✅ downgraded from gpt-4o to save quota
             messages=[
                 {"role": "system", "content": "You are an expert Ayurveda consultant. Answer in simple and helpful language."},
                 {"role": "user", "content": user_message}
