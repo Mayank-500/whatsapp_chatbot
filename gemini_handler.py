@@ -44,17 +44,14 @@ GEMINI_KEYWORDS = {
     ]
 }
 
-# Fuzzy keyword matcher
 def smart_gemini_reply(user_message):
     user_msg = user_message.lower()
     for topic, keywords in GEMINI_KEYWORDS.items():
         for keyword in keywords:
-            # Looser match: full or partial word present
             if keyword in user_msg or user_msg in keyword or any(k in user_msg.split() for k in keyword.split()):
                 return generate_gemini_answer(user_message)
     return None
 
-# Gemini content generation
 def generate_gemini_answer(prompt):
     try:
         genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
@@ -64,4 +61,3 @@ def generate_gemini_answer(prompt):
     except Exception as e:
         print("❌ Gemini error:", e)
         return None
-

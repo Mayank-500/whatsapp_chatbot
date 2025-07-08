@@ -5,7 +5,7 @@ import os
 import re
 from dotenv import load_dotenv
 from shopify_utils import fetch_order_status_by_phone
-from gemini_handler import smart_gemini_reply
+from gemini_handler import smart_gemini_reply  # ✅ Gemini fallback added
 
 # Load environment variables
 load_dotenv()
@@ -24,6 +24,7 @@ if os.path.exists(FAQ_FILE):
     with open(FAQ_FILE, "r") as f:
         faq = json.load(f)
 
+# -------------------- Webhook Verification --------------------
 @app.route("/webhook", methods=["GET"])
 def verify():
     mode = request.args.get("hub.mode")
@@ -33,6 +34,7 @@ def verify():
         return challenge, 200
     return "Verification failed", 403
 
+# -------------------- Webhook for WhatsApp Messages --------------------
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
@@ -54,12 +56,16 @@ def webhook():
             return "OK", 200
 
         reply = check_faq(user_text)
+        print("📚 FAQ reply:", reply)
+
         if reply:
             send_whatsapp_message(user_id, reply)
         else:
-            gemini_response = smart_gemini_reply(user_text)
-            if gemini_response:
-                send_whatsapp_message(user_id, gemini_response)
+            gemini_reply = smart_gemini_reply(user_text)
+            print("🔮 Gemini reply:", gemini_reply)
+
+            if gemini_reply:
+                send_whatsapp_message(user_id, gemini_reply)
             else:
                 send_whatsapp_message(user_id, "🙏 Sorry, I didn't understand. Please ask about consultation, products, or orders.")
 
@@ -67,6 +73,8 @@ def webhook():
         print("❌ Webhook error:", e)
 
     return "OK", 200
+
+# -------------------- Helper Functions --------------------
 
 def extract_phone_number(message):
     match = re.search(r"\b\d{10}\b", message)
@@ -95,7 +103,7 @@ def send_whatsapp_message(to, message):
     r = requests.post(WHATSAPP_API_URL, headers=headers, json=payload)
     print("✅ Message sent:", r.status_code, r.text)
 
+# -------------------- Start Flask App --------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
-
