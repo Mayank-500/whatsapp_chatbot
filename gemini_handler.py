@@ -5,14 +5,17 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 
+# Load .env variables
 load_dotenv()
 
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+# ✅ Set GOOGLE_API_KEY environment variable manually
+api_key = os.getenv("GEMINI_API_KEY")
+if api_key:
+    os.environ["GOOGLE_API_KEY"] = api_key
 
 def smart_gemini_reply(user_message):
     try:
         model = "gemini-2.5-pro"
-
         client = genai.Client()
 
         contents = [
