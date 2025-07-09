@@ -1,6 +1,6 @@
 {
   "greeting": {
-    "keywords": ["hi", "hello", "namaste", "hey","good morning","good afternoon","good evening","heya","ram ram ji","sun bhai"],
+    "keywords": ["hi", "hello", "namaste", "hey","morning","afternoon","evening","heya","ram ram ji","sun bhai"],
     "response": "Namaste. Welcome to TACX - The Ayurveda Co. How may I assist you today?\n1. Explore Products\n2. Book Consultation\n3. Track Order\n4. Ask a Health Question"
   },
   "explore products": {
@@ -12,7 +12,7 @@
     "response": "Track your TACX order here: https://tacx.in/track-order"
   },
   "support": {
-    "keywords": ["support", "issue", "complaint", "refund", "return product queries", "company policy"],
+    "keywords": ["issue", "complaint", "refund", "return product queries", "company policy"],
     "response": "We're here to help: https://tacx.in/support"
   },
   "offers": {
