@@ -1,63 +1,42 @@
 import os
-import google.generativeai as genai
+from google import genai
+from google.genai import types
+from dotenv import load_dotenv
 
-# Keywords mapped to company-related topics
-GEMINI_KEYWORDS = {
-    "kumkumadi": [
-        "kumkumadi", "kumkumadi oil", "kumkumadi tailam",
-        "kumkumadi face oil", "kumkumadi serum", "kumkumadi benefits",
-        "kumkumadi uses", "face oil for glowing skin"
-    ],
-    "ubtan": [
-        "ubtan", "ubtan face pack", "ubtan scrub", "natural face scrub", "herbal ubtan"
-    ],
-    "pcos": [
-        "pcos", "pcod", "irregular periods", "hormonal balance",
-        "fertility support", "ayurvedic medicine for pcos"
-    ],
-    "triphala": [
-        "triphala", "triphala churna", "triphala powder",
-        "constipation remedy", "digestion remedy", "triphala benefits"
-    ],
-    "ashwagandha": [
-        "ashwagandha", "ashwagandha tablets", "stress relief",
-        "energy booster", "sleep improvement", "ayurvedic immunity booster"
-    ],
-    "haircare": [
-        "hair oil", "hair fall", "dry scalp",
-        "ayurvedic hair treatment", "natural hair oil", "hair serum"
-    ],
-    "skincare": [
-        "face serum", "face wash", "glow skin", "acne",
-        "pigmentation", "natural skincare", "herbal skincare"
-    ],
-    "digestion": [
-        "digestion", "acidity", "bloating", "gut health",
-        "digestive syrup", "indigestion"
-    ],
-    "immunity": [
-        "boost immunity", "cold and cough", "fever",
-        "natural kadha", "immune booster syrup", "ayurvedic immunity booster"
-    ],
-    "bodycare": [
-        "body wash", "body lotion", "dry skin", "moisturizer", "natural body lotion"
-    ]
-}
+load_dotenv()
 
-def smart_gemini_reply(user_message):
-    user_msg = user_message.lower()
-    for topic, keywords in GEMINI_KEYWORDS.items():
-        for keyword in keywords:
-            if keyword in user_msg or user_msg in keyword or any(k in user_msg.split() for k in keyword.split()):
-                return generate_gemini_answer(user_message)
-    return None
+# Gemini API initialization
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+model = "gemini-2.5-pro"
 
-def generate_gemini_answer(prompt):
+SYSTEM_INSTRUCTION = """you are ayurvedic expert of the ayurveda co. Tacx and who reply for every questions related to ayurveda x science taking in mind of our company surrounding products and ayurveda knowleadge in best conversational format (every answer should take lastly max to max seven lines to present limit) and after every answer it should return a recommendation of product related to conversations but there are two things first restrict yourself within ayurveda x science do not reply for other converstions (only question related to ayurveda x science ) and secondly do not reply for these keywords(keyword list -hi, hello, namaste, hey, shop, buy, offer, discount, coupon, issue, complaint, refund, return, policy, track, order, status, delivery, productshopping, shop, buy)
+"""
+
+def get_gemini_response(user_input):
     try:
-        genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-        model = genai.GenerativeModel('gemini-pro')
-        response = model.generate_content(prompt)
-        return response.text.strip()
+        contents = [
+            types.Content(
+                role="user",
+                parts=[types.Part.from_text(text=user_input)],
+            )
+        ]
+
+        config = types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_budget=-1),
+            response_mime_type="text/plain",
+            system_instruction=[
+                types.Part.from_text(text=SYSTEM_INSTRUCTION)
+            ],
+        )
+
+        output = ""
+        for chunk in client.models.generate_content_stream(
+            model=model, contents=contents, config=config
+        ):
+            output += chunk.text
+        return output.strip()
+
     except Exception as e:
-        print("❌ Gemini error:", e)
-        return None
+        print("⚠️ Gemini AI Error:", e)
+        return "❌ Sorry, I'm unable to respond right now. Please try again later."
+

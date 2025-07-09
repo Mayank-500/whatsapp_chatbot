@@ -62,3 +62,4 @@ def fetch_order_status_by_phone(phone_number):
     except Exception as e:
         print("❌ Shopify Exception:", e)
         return "⚠️ Internal error while fetching order. Please try again."
+

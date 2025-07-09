@@ -5,7 +5,7 @@ import os
 import re
 from dotenv import load_dotenv
 from shopify_utils import fetch_order_status_by_phone
-from gemini_handler import smart_gemini_reply  # ✅ Gemini fallback added
+from gemini_handler import get_gemini_response
 
 # Load environment variables
 load_dotenv()
@@ -61,13 +61,9 @@ def webhook():
         if reply:
             send_whatsapp_message(user_id, reply)
         else:
-            gemini_reply = smart_gemini_reply(user_text)
-            print("🔮 Gemini reply:", gemini_reply)
-
-            if gemini_reply:
-                send_whatsapp_message(user_id, gemini_reply)
-            else:
-                send_whatsapp_message(user_id, "🙏 Sorry, I didn't understand. Please ask about consultation, products, or orders.")
+            # Use Gemini AI as fallback
+            ai_reply = get_gemini_response(user_text)
+            send_whatsapp_message(user_id, ai_reply)
 
     except Exception as e:
         print("❌ Webhook error:", e)
