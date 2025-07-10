@@ -1,6 +1,7 @@
 import os
 from google import genai
-from google.generativeai.types.content_types import Content
+from google.generativeai.types import Content
+
 
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
