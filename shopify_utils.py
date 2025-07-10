@@ -14,7 +14,7 @@ HEADERS = {
 
 QUERY_TEMPLATE = """
 query GetCustomers {
-  customers(first: 10, query: "phone:%s") {
+  customers(first: 1, query: "phone:%s") {
     nodes {
       firstName
       lastName
@@ -30,18 +30,13 @@ query GetCustomers {
 }
 """
 
-def fetch_order_status_by_phone(phone_number):
+def fetch_order_status_by_phone(phone_number: str) -> str:
     query = QUERY_TEMPLATE % phone_number
     try:
-        response = requests.post(
-            SHOPIFY_API_URL,
-            headers=HEADERS,
-            json={"query": query}
-        )
-
+        response = requests.post(SHOPIFY_API_URL, headers=HEADERS, json={"query": query})
         if response.status_code != 200:
             print("⚠️ Shopify API error:", response.text)
-            return "❌ Failed to fetch order details. Please try again later."
+            return "❌ Unable to fetch your order details right now. Please try again later."
 
         data = response.json()
         customers = data.get("data", {}).get("customers", {}).get("nodes", [])
@@ -54,12 +49,10 @@ def fetch_order_status_by_phone(phone_number):
             return f"📭 No orders found for {customer.get('firstName', 'this customer')}."
 
         latest_order = orders[0]
-        order_name = latest_order.get("name")
-        status = latest_order.get("displayFulfillmentStatus")
-
-        return f"📦 Order *{order_name}* is currently: *{status}*."
+        return f"📦 Order *{latest_order['name']}* is currently: *{latest_order['displayFulfillmentStatus']}*."
 
     except Exception as e:
         print("❌ Shopify Exception:", e)
-        return "⚠️ Internal error while fetching order. Please try again."
+        return "⚠️ Internal error while checking your order. Please try again soon."
+
 

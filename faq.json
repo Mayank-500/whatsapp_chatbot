@@ -1,23 +1,22 @@
 {
   "greeting": {
-    "keywords": ["hi", "hello", "namaste", "hey","morning","afternoon","evening","heya","ram ram ji","sun bhai"],
-    "response": "Namaste. Welcome to TACX - The Ayurveda Co. How may I assist you today?\n1. Explore Products\n2. Book Consultation\n3. Track Order\n4. Ask a Health Question"
+    "keywords": ["hi", "hello", "namaste", "hey", "morning", "evening","afternoon"],
+    "response": "Namaste. Welcome to TACX - The Ayurveda Co. 🌿 How may I help you today?\n1. Explore Products\n2. Track Order\n3. Ask a Wellness Question"
   },
   "explore products": {
-    "keywords": [ "productshopping", "shop", "buy"],
-    "response": "Explore our shop: https://tacx.in/shop"
+    "keywords": ["shop", "buy"],
+    "response": "🛍️ Explore our Ayurvedic Shop → https://tacx.in/shop"
   },
   "track order": {
-    "keywords": ["track", "order", "status", "delivery"],
-    "response": "Track your TACX order here: https://tacx.in/track-order"
+    "keywords": ["track", "order", "status"],
+    "response": "📦 Track your TACX order here → https://tacx.in/track-order"
+  },
+  "discount": {
+    "keywords": ["discount", "coupon", "offers"],
+    "response": "🎁 View current offers → https://tacx.in/collections/combo-offers"
   },
   "support": {
-    "keywords": ["issue", "complaint", "refund", "return product queries", "company policy"],
-    "response": "We're here to help: https://tacx.in/support"
-  },
-  "offers": {
-    "keywords": [ "discount", "coupon"],
-    "response": "Check out our latest offers: https://tacx.in/collections/combo-offers"
+    "keywords": ["issue", "complaint", "refund", "return", "policy"],
+    "response": "📞 For support or returns, visit → https://tacx.in/support"
   }
 }
-
