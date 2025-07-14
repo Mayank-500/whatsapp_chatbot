@@ -6,6 +6,9 @@ load_dotenv()
 
 SHOPIFY_API_URL = os.getenv("SHOPIFY_API_URL")
 SHOPIFY_ACCESS_TOKEN = os.getenv("SHOPIFY_ACCESS_TOKEN")
+ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
+PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
+WHATSAPP_API_URL = f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages"
 
 HEADERS = {
     "Content-Type": "application/json",
@@ -14,7 +17,7 @@ HEADERS = {
 
 QUERY_TEMPLATE = """
 query GetCustomers {
-  customers(first: 1, query: "phone:%s") {
+  customers(first: 10, query: "phone:%s") {
     nodes {
       firstName
       lastName
@@ -30,29 +33,40 @@ query GetCustomers {
 }
 """
 
-def fetch_order_status_by_phone(phone_number: str) -> str:
+def fetch_order_status_by_phone(phone_number):
     query = QUERY_TEMPLATE % phone_number
     try:
-        response = requests.post(SHOPIFY_API_URL, headers=HEADERS, json={"query": query})
+        response = requests.post(
+            SHOPIFY_API_URL,
+            headers=HEADERS,
+            json={"query": query}
+        )
         if response.status_code != 200:
-            print("⚠️ Shopify API error:", response.text)
-            return "❌ Unable to fetch your order details right now. Please try again later."
-
+            return "❌ Failed to fetch order details. Please try again later."
         data = response.json()
         customers = data.get("data", {}).get("customers", {}).get("nodes", [])
         if not customers:
             return f"❌ No customer found with phone number: {phone_number}"
-
         customer = customers[0]
         orders = customer.get("orders", {}).get("nodes", [])
         if not orders:
             return f"📭 No orders found for {customer.get('firstName', 'this customer')}."
-
         latest_order = orders[0]
-        return f"📦 Order *{latest_order['name']}* is currently: *{latest_order['displayFulfillmentStatus']}*."
-
+        order_name = latest_order.get("name")
+        status = latest_order.get("displayFulfillmentStatus")
+        return f"📦 Order *{order_name}* is currently: *{status}*."
     except Exception as e:
         print("❌ Shopify Exception:", e)
-        return "⚠️ Internal error while checking your order. Please try again soon."
+        return "⚠️ Internal error while fetching order."
 
-
+def send_whatsapp_message(to, message):
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": to,
+        "text": {"body": message}
+    }
+    requests.post(WHATSAPP_API_URL, headers=headers, json=payload)

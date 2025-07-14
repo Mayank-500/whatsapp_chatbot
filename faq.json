@@ -7,16 +7,14 @@
     "keywords": ["shop", "buy"],
     "response": "🛍️ Explore our Ayurvedic Shop → https://tacx.in/shop"
   },
-  "track order": {
-    "keywords": ["track", "order", "status"],
-    "response": "📦 Track your TACX order here → https://tacx.in/track-order"
-  },
-  "discount": {
-    "keywords": ["discount", "coupon", "offers"],
-    "response": "🎁 View current offers → https://tacx.in/collections/combo-offers"
-  },
-  "support": {
-    "keywords": ["issue", "complaint", "refund", "return", "policy"],
-    "response": "📞 For support or returns, visit → https://tacx.in/support"
+  "shipping": {
+      "keywords": ["shipping", "delivery", "time", "when", "receive"],
+      "response": "🚚 Your order will be delivered within 3-5 working days across India!"
+    },
+    "returns": {
+      "keywords": ["return", "refund", "replace"],
+      "response": "🔁 We offer easy returns within 7 days of delivery for unopened products."
+    }
   }
-}
+  
+
