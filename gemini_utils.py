@@ -1,10 +1,10 @@
 import os
 from google import genai
-from google.genai import types
 from dotenv import load_dotenv
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
 model = genai.GenerativeModel("gemini-2.5-pro")
 
 def get_gemini_reply(user_text):
@@ -28,7 +28,6 @@ hi, hello, namaste, hey, morning, coupon, refund, complaint, abuse, delivery, or
 
 🧠 Smart Quiz System (Only for Body-Related Concerns):
 If user talks about health/body symptoms (like hair fall, digestion, sleep, acne, weight), trigger a 3-step quiz.
-[... quiz logic described in your system prompt ...]
 
 ⭐ Always include product recommendation like:
 🧴 *Product Name*  
@@ -44,7 +43,7 @@ If user talks about health/body symptoms (like hair fall, digestion, sleep, acne
             system_instruction=system_instruction
         )
 
-        return response.text.strip()
+        return response.text.strip() if response.text else "🤖 Sorry, I couldn’t generate a reply. Try rephrasing?"
 
     except Exception as e:
         print("❌ Gemini error:", e)
