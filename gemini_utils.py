@@ -1,88 +1,40 @@
-# pip install google-genai python-dotenv
-
 import os
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
+import google.generativeai as genai
 
-# Load API key from .env
+# Load environment variables from .env file
 load_dotenv()
-api_key = os.environ.get("GEMINI_API_KEY")
 
-if not api_key:
-    raise EnvironmentError("❌ GEMINI_API_KEY is missing in your .env file.")
+# Configure the Gemini API key
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-# Create Gemini client
-client = genai.Client(api_key=api_key)
+# Initialize the Gemini model
+model = genai.GenerativeModel("gemini-1.5-pro")  # or "gemini-pro" as fallback
 
-# TACX system instruction
-system_instruction = """
+# Gemini reply function
+def get_gemini_reply(user_text):
+    try:
+        # Define system behavior
+        system_instruction = """
 🔮 TACX Ayurvedic AI Support (WhatsApp Version)
 
-You are TACX – the Ayurvedic AI Expert of The Ayurveda Co.  
-Respond ONLY to health, beauty & wellness topics rooted in Ayurveda × Modern Science.  
-Focus Areas: Doshas, skin/hair/body issues, sleep, gut, mental health, herbs, beauty, energy, immunity, etc.
+You are TACX – the Ayurvedic AI Expert of The Ayurveda Co.
+Respond ONLY to questions related to Ayurveda × Science such as doshas, herbs, immunity, beauty, gut health, sleep, mental clarity, hair/skin/body issues and anything that surrounds the company and Ayurvedic health.
 
-🚫 Strictly DO NOT reply to:
-hi, hello, namaste, hey, morning, coupon, refund, complaint, abuse, delivery, order, track status — or any non-ayurvedic conversation.
+❌ Do NOT reply to non-Ayurveda topics or any general greetings like:
+hi, hello, namaste, hey, morning etc.
+"""
 
-✅ Conversational Rules:
-- Keep reply short, crisp, max 6 lines
-- Use Hinglish (Hindi+English), like a friendly Ayurvedic doctor
-- Use creative, varied response styles (✨ emojis, ⭐ bullets, 🔗 CTA buttons)
-- Maintain memory for flowing conversations
-- Never sound robotic or repetitive
+        # Create a new chat session with initial system prompt
+        chat = model.start_chat(history=[
+            {"role": "system", "parts": [system_instruction]},
+        ])
 
-🧠 Smart Quiz System (Only for Body-Related Concerns):
-If user talks about health/body symptoms (like hair fall, digestion, sleep, acne, weight), trigger a **3-step interactive quiz** to identify exact concern:
-  - Step 1: Ask 3 possible types of the problem
-  - Step 2: User replies with number (1, 2, or 3)
-  - Step 3: Give smart Ayurvedic product recommendation based on the selection
-🛑 Do NOT run quiz on non-body topics like: tulsi benefits, what is triphala, etc.
-❌ Do NOT say “Start Quiz” again and again – show only once, and don’t follow up if ignored.
-⛔ Do not repeat earlier steps or explanations after Step 3.
+        # Send user's message and receive AI reply
+        response = chat.send_message(user_text)
 
-⭐ Recommended TACX Product:  
-🧴 *Product Name*  
-🔘 [🛒 Buy Now] [📖 Learn More]
-
-🎁 If applicable, show Combo Offers from curated `combo.json` list
-""".strip()
-
-# Core response function
-def get_gemini_reply(user_input):
-    try:
-        model = "gemini-2.5-flash"
-
-        contents = [
-            types.Content(
-                role="user",
-                parts=[types.Part(text=user_input)]
-            )
-        ]
-
-        config = types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_budget=-1),
-            response_mime_type="text/plain",
-            system_instruction=[types.Part(text=system_instruction)]
-        )
-
-        print("🤖 TACX AI replying...\n")
-        full_response = ""
-        for chunk in client.models.generate_content_stream(
-            model=model,
-            contents=contents,
-            config=config,
-        ):
-            full_response += chunk.text
-        return full_response.strip()
+        # Return clean text
+        return response.text.strip()
 
     except Exception as e:
-        print("❌ Gemini error:", e)
-        return "⚠️ Internal error with Ayurvedic assistant. Please try again later."
-
-# Run standalone
-if __name__ == "__main__":
-    user_input = input("Ask TACX something Ayurvedic: ")
-    reply = get_gemini_reply(user_input)
-    print("\n" + reply)
+        return f"❌ Gemini Error: {str(e)}"
