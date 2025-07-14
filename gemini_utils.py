@@ -41,3 +41,4 @@ hi, hello, namaste, hey, morning etc.
             return generate_reply(FALLBACK_MODEL)
         except Exception as fallback_error:
             return f"❌ Gemini Fallback Error: {str(fallback_error)}"
+
