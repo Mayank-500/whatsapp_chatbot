@@ -2,11 +2,7 @@
   "greeting": {
     "keywords": ["hi", "hello", "namaste", "hey", "morning", "evening","afternoon"],
     "response": "Namaste. Welcome to TACX - The Ayurveda Co. 🌿 How may I help you today?\n1. Explore Products\n2. Track Order\n3. Ask a Wellness Question"
-  },
-  "explore products": {
-    "keywords": ["shop", "buy"],
-    "response": "🛍️ Explore our Ayurvedic Shop → https://tacx.in/shop"
-  },
+  }, 
   "shipping": {
       "keywords": ["shipping", "delivery", "time", "when", "receive"],
       "response": "🚚 Your order will be delivered within 3-5 working days across India!"
