@@ -8,14 +8,12 @@ load_dotenv()
 # Configure the Gemini API key
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-# Initialize the Gemini model
-model = genai.GenerativeModel("gemini-1.5-pro")  # or "gemini-pro" as fallback
+# Use the new Gemini 2.5 Flash model (fast + smart)
+PRIMARY_MODEL = "gemini-2.5-flash"
+FALLBACK_MODEL = "gemini-pro"
 
-# Gemini reply function
 def get_gemini_reply(user_text):
-    try:
-        # Define system behavior
-        system_instruction = """
+    system_instruction = """
 🔮 TACX Ayurvedic AI Support (WhatsApp Version)
 
 You are TACX – the Ayurvedic AI Expert of The Ayurveda Co.
@@ -25,16 +23,21 @@ Respond ONLY to questions related to Ayurveda × Science such as doshas, herbs, 
 hi, hello, namaste, hey, morning etc.
 """
 
-        # Create a new chat session with initial system prompt
+    def generate_reply(model_name):
+        model = genai.GenerativeModel(model_name)
         chat = model.start_chat(history=[
             {"role": "system", "parts": [system_instruction]},
         ])
+        return chat.send_message(user_text).text.strip()
 
-        # Send user's message and receive AI reply
-        response = chat.send_message(user_text)
-
-        # Return clean text
-        return response.text.strip()
+    try:
+        return generate_reply(PRIMARY_MODEL)
 
     except Exception as e:
-        return f"❌ Gemini Error: {str(e)}"
+        print(f"⚠️ Primary model ({PRIMARY_MODEL}) failed: {e}")
+        if "429" in str(e):
+            return "⚠️ We're currently handling too many requests. Please try again shortly."
+        try:
+            return generate_reply(FALLBACK_MODEL)
+        except Exception as fallback_error:
+            return f"❌ Gemini Fallback Error: {str(fallback_error)}"
