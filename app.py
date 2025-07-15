@@ -1,106 +1,71 @@
 from flask import Flask, request
-import requests
-import json
 import os
-import re
+import json
 from dotenv import load_dotenv
 from shopify_utils import fetch_order_status_by_phone
-from gemini_utils import get_gemini_reply  # ✅ Import Gemini logic
+from gemini_utils import get_gemini_reply
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 
+VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
-VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
-WHATSAPP_API_URL = f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages"
 
-# Load FAQ data
-FAQ_FILE = "faq.json"
-faq = {}
-if os.path.exists(FAQ_FILE):
-    with open(FAQ_FILE, "r") as f:
-        faq = json.load(f)
-
-# -------------------- Webhook Verification --------------------
-@app.route("/webhook", methods=["GET"])
-def verify():
-    mode = request.args.get("hub.mode")
-    token = request.args.get("hub.verify_token")
-    challenge = request.args.get("hub.challenge")
-    if mode == "subscribe" and token == VERIFY_TOKEN:
-        return challenge, 200
-    return "Verification failed", 403
-
-# -------------------- Webhook for WhatsApp Messages --------------------
-@app.route("/webhook", methods=["POST"])
+@app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
-    data = request.get_json()
-    try:
-        message = data['entry'][0]['changes'][0]['value']['messages'][0]
-        user_id = message['from']
+    if request.method == 'GET':
+        if request.args.get("hub.verify_token") == VERIFY_TOKEN:
+            return request.args.get("hub.challenge")
+        return "Invalid verification token", 403
 
-        if 'text' not in message:
-            print("⚠️ Non-text message received:", message)
-            return "OK", 200
+    if request.method == 'POST':
+        data = request.get_json()
+        try:
+            for entry in data.get("entry", []):
+                for change in entry.get("changes", []):
+                    value = change.get("value", {})
+                    messages = value.get("messages", [])
+                    if messages:
+                        message = messages[0]
+                        user_text = message["text"]["body"]
+                        sender_id = message["from"]
 
-        user_text = message['text']['body'].lower()
-        print("📩 Received message:", user_text)
+                        print(f"📩 Received message: {user_text}")
 
-        phone = extract_phone_number(user_text)
-        if phone:
-            reply = fetch_order_status_by_phone(phone)
-            send_whatsapp_message(user_id, reply)
-            return "OK", 200
+                        # Fallback check: If user asks for order tracking
+                        if "track" in user_text.lower():
+                            order_status = fetch_order_status_by_phone(sender_id)
+                            reply_text = order_status if order_status else "❌ No order found for this number."
+                        else:
+                            gemini_reply = get_gemini_reply(user_text)
+                            reply_text = gemini_reply if gemini_reply else "🙏 I'm here only to guide you on Ayurveda + Wellness topics."
 
-        reply = check_faq(user_text)
-        print("📚 FAQ reply:", reply)
+                        send_whatsapp_message(sender_id, reply_text)
 
-        if reply:
-            send_whatsapp_message(user_id, reply)
-        else:
-            # 🧠 If not found in FAQ, get Gemini reply
-            reply = get_gemini_reply(user_text)
-            send_whatsapp_message(user_id, reply)
+        except Exception as e:
+            print("❌ Webhook error:", e)
 
-    except Exception as e:
-        print("❌ Webhook error:", e)
+        return "OK", 200
 
-    return "OK", 200
-
-# -------------------- Helper Functions --------------------
-
-def extract_phone_number(message):
-    match = re.search(r"\b\d{10}\b", message)
-    if match:
-        return "+91" + match.group()
-    return None
-
-def check_faq(message):
-    for category, entry in faq.items():
-        if isinstance(entry, dict) and "keywords" in entry:
-            for keyword in entry["keywords"]:
-                if keyword.lower() in message:
-                    return entry.get("response")
-    return None
-
-def send_whatsapp_message(to, message):
+def send_whatsapp_message(phone, text):
+    url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
         "Content-Type": "application/json"
     }
     payload = {
         "messaging_product": "whatsapp",
-        "to": to,
-        "text": {"body": message}
+        "to": phone,
+        "type": "text",
+        "text": {
+            "body": text
+        }
     }
-    r = requests.post(WHATSAPP_API_URL, headers=headers, json=payload)
-    print("✅ Message sent:", r.status_code, r.text)
+    response = request.post(url, headers=headers, data=json.dumps(payload))
+    print(f"✅ Message sent: {response.status_code}", response.text)
 
-# -------------------- Start Flask App --------------------
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
-
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)
