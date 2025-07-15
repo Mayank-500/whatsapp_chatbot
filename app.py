@@ -16,15 +16,18 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 
+
 @app.route('/')
 def home():
     return "🌿 TACX Ayurvedic AI Bot is running."
+
 
 @app.route('/webhook', methods=['GET'])
 def verify():
     if request.args.get("hub.verify_token") == VERIFY_TOKEN:
         return request.args.get("hub.challenge")
     return "❌ Invalid verification token"
+
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
@@ -42,21 +45,21 @@ def webhook():
 
                 for message in messages:
                     phone_number = value.get("metadata", {}).get("display_phone_number", "")
-                    user_id = message.get("from")
+                    user_id = message.get("from")  # WhatsApp sender ID
                     user_text = message.get("text", {}).get("body", "").strip()
 
                     # Handle order tracking keywords
                     if re.search(r"\b(order|track|refund)\b", user_text.lower()):
-                        phone_match = re.search(r'\d{10}', user_text)
+                        phone_match = re.search(r'\d{10,13}', user_text)
                         if phone_match:
-                            phone_number = phone_match.group()
-                            order_status = fetch_order_status_by_phone(phone_number)
+                            number = phone_match.group()[-10:]  # Normalize to last 10 digits
+                            order_status = fetch_order_status_by_phone(number)
                             reply_text = order_status or "❌ No order found with this number."
                         else:
                             reply_text = "📦 Please share your 10-digit phone number to track the order."
                     else:
-                        # Otherwise handle via Gemini AI
-                        reply_text = get_gemini_reply(user_text)
+                        # Otherwise handle via Gemini AI (memory-aware)
+                        reply_text = get_gemini_reply(user_text, user_id)
 
                     send_whatsapp_message(user_id, reply_text)
 
@@ -64,6 +67,7 @@ def webhook():
         print("❌ Webhook error:", e)
 
     return "OK", 200
+
 
 def send_whatsapp_message(recipient_id, message):
     url = f"https://graph.facebook.com/v17.0/{PHONE_NUMBER_ID}/messages"
@@ -82,6 +86,7 @@ def send_whatsapp_message(recipient_id, message):
 
     response = requests.post(url, headers=headers, json=payload)
     print("✅ Message sent:", response.status_code, response.text)
+
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

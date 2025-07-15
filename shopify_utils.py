@@ -1,16 +1,17 @@
 import requests
 import os
+import re
 from dotenv import load_dotenv
 
 load_dotenv()
 
-SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL")  # e.g., 'https://yourstore.myshopify.com'
+SHOPIFY_STORE_URL = os.getenv("SHOPIFY_STORE_URL")
 SHOPIFY_ACCESS_TOKEN = os.getenv("SHOPIFY_ACCESS_TOKEN")
 
 def fetch_order_status_by_phone(phone_number):
     """
     Fetch order status using Shopify Admin API by phone number.
-    Assumes `phone_number` is in international format (e.g., +91XXXXXXXXXX or 91XXXXXXXXXX).
+    Assumes `phone_number` is in international format or ends in 10 digits.
     """
     try:
         url = f"{SHOPIFY_STORE_URL}/admin/api/2023-07/orders.json?status=any"
@@ -28,11 +29,11 @@ def fetch_order_status_by_phone(phone_number):
         for order in orders:
             customer = order.get("customer", {})
             if customer:
-                customer_phone = str(customer.get("phone", "")).replace("+", "").replace(" ", "")
+                customer_phone = re.sub(r'\D', '', str(customer.get("phone", "")))
                 if phone_number[-10:] in customer_phone[-10:]:
                     return f"📦 Order #{order['name']} is currently *{order['fulfillment_status'] or 'unfulfilled'}*."
 
-        return None  # No matching order found
+        return None
 
     except Exception as e:
         print("❌ Shopify fetch error:", e)
