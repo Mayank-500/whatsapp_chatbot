@@ -49,22 +49,21 @@ def get_gemini_reply(user_text, user_id=None):
         user_text_clean = user_text.lower().strip()
         memory.append(user_text)
 
-        # Track last product
+        # Track last product mentioned
         product_keywords = {
             "kajal": "Ayurvedic Black Kajal",
             "kumkumadi": "Kumkumadi Face Wash",
             "oil": "Ayurvedic Hair Oil",
             "serum": "Glow Boosting Face Serum",
-            "shampoo": "Onion Hair Shampoo",
-            "cream": "Vitamin C & E Face Cream",
-            "balm": "Eucalyptus & Peppermint Pain Relief Balm",
-            "potli": "Mahanarayan Potli"
+            "shampoo": "Onion Hair Shampoo"
         }
+        
         for keyword, product in product_keywords.items():
             if keyword in user_text_clean:
                 context["last_product"] = product
                 break
 
+        # Compose prompt with memory context
         prompt_parts = [SYSTEM_PROMPT]
         prompt_parts.extend(memory[-10:])
         prompt_parts.append(user_text)
@@ -75,7 +74,7 @@ def get_gemini_reply(user_text, user_id=None):
                 temperature=0.7
             )
         )
-
+        
         reply = response.text.strip()
         memory.append(reply)
         return reply
@@ -83,7 +82,4 @@ def get_gemini_reply(user_text, user_id=None):
     except Exception as e:
         print("❌ Gemini Error:", e)
         return "Sorry, I'm having trouble processing your request. Please try again later."
-
-def get_last_product(user_id):
-    return user_context[user_id].get("last_product")
 

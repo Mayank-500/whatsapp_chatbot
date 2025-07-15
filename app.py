@@ -5,7 +5,7 @@ import os
 import re
 from dotenv import load_dotenv
 from shopify_utils import fetch_order_status_by_phone
-from gemini_utils import get_gemini_reply, get_last_product
+from gemini_utils import get_gemini_reply
 from recommendation_utils import get_product_recommendation
 
 # Load environment variables
@@ -32,6 +32,7 @@ def verify():
     return "❌ Invalid verification token"
 
 def check_faq(user_text):
+    """Check if user query matches any FAQ"""
     user_text = user_text.lower().strip()
     for faq in FAQ_DATA.values():
         for keyword in faq['keywords']:
@@ -74,19 +75,13 @@ def webhook():
                         else:
                             reply_text = "📦 Please share your 10-digit phone number to track the order."
 
-                    # Handle product recommendations + memory
-                    elif any(keyword in user_text.lower() for keyword in [
-                        "product", "buy", "recommend", "suggest", "shampoo", "oil",
-                        "serum", "cream", "kumkumadi", "kajal", "face wash", "link"
-                    ]):
-                        if "link" in user_text.lower() or "buy" in user_text.lower():
-                            last_product = get_last_product(user_id)
-                            if last_product:
-                                reply_text = get_product_recommendation(last_product)
-                            else:
-                                reply_text = "Please mention the product name you'd like to buy."
-                        else:
-                            reply_text = get_product_recommendation(user_text)
+                    # Handle product recommendations
+                    elif any(keyword in user_text.lower() for keyword in 
+                             ["product", "buy", "recommend", "suggest", "shampoo", "oil", 
+                              "serum", "cream", "kumkumadi", "kajal", "face wash", "under eye", "cleanser", "cleaning milk"]):
+                        reply_text = get_product_recommendation(user_text)
+
+                    # Handle wellness questions (Gemini AI)
                     else:
                         reply_text = get_gemini_reply(user_text, user_id)
 
