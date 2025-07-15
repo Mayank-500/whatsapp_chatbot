@@ -1,14 +1,18 @@
 import os
-import google.generativeai as genai 
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
 
-def get_product_recommendation(user_query):
-    """Get product recommendation from specialized Gemini model"""
+def get_product_recommendation(user_query, last_product=None):
     try:
         genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
         model = genai.GenerativeModel("gemini-2.5-flash")
+
+        if not any(word in user_query.lower() for word in ["cream", "oil", "serum", "kajal", "shampoo", "buy", "link", "purchase"]) and last_product:
+            query_text = f"I want to buy {last_product}"
+        else:
+            query_text = user_query
 
         system_instruction = """You are TACX Product Recommendation AI, an expert assistant for The Ayurveda Co. (TACX) WhatsApp bot. Your job is to intelligently suggest product links, combo options, and offers — but only when a product is actually recommended during the chat, not randomly or repetitively.
 
@@ -24,7 +28,7 @@ Show any available offers/discounts related to the product or combo only when th
 Avoid suggesting products, combos, or offers again in the same session unless the user asks again explicitly.
 
 Input Data: urldata-{
-     "Upto 20% Off!": {
+    "Upto 20% Off!": {
         "url": "https://theayurvedaco.com/collections/all-products-onsite"
     },
     "Additional 7% Off on All Prepaid Orders!": {
@@ -1153,20 +1157,20 @@ Input Data: urldata-{
   "BhringaBali Hair Growth CapsulesSold out": {
     "url": "https://theayurvedaco.com/products/bhringabali-hair-growth-30-veg-capsules"
   }
-    
-    
-}
-"""
-
-        full_prompt = f"{system_instruction}\n\nUser query: {user_query}"
+}"""  
 
         response = model.generate_content(
-            [full_prompt],
-            generation_config=genai.types.GenerationConfig(temperature=0.7)
+            contents=[{
+                "role": "user",
+                "parts": [query_text]
+            }],
+            generation_config={
+                "system_instruction": system_instruction
+            }
         )
 
-        return response.text.strip()
-
+        return response.text
+        
     except Exception as e:
         print(f"❌ Recommendation Error: {str(e)}")
         return "I'm having trouble accessing product recommendations right now. Please try again later."

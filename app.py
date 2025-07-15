@@ -5,10 +5,9 @@ import os
 import re
 from dotenv import load_dotenv
 from shopify_utils import fetch_order_status_by_phone
-from gemini_utils import get_gemini_reply
+from gemini_utils import get_gemini_reply, user_context
 from recommendation_utils import get_product_recommendation
 
-# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
@@ -17,7 +16,6 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 
-# Load FAQ data
 with open('faq.json') as f:
     FAQ_DATA = json.load(f)
 
@@ -32,7 +30,6 @@ def verify():
     return "❌ Invalid verification token"
 
 def check_faq(user_text):
-    """Check if user query matches any FAQ"""
     user_text = user_text.lower().strip()
     for faq in FAQ_DATA.values():
         for keyword in faq['keywords']:
@@ -59,13 +56,11 @@ def webhook():
                     user_id = message.get("from")
                     user_text = message.get("text", {}).get("body", "").strip()
 
-                    # First check FAQ
                     faq_response = check_faq(user_text)
                     if faq_response:
                         send_whatsapp_message(user_id, faq_response)
                         continue
 
-                    # Handle order tracking
                     if re.search(r"\b(order|track|refund)\b", user_text.lower()):
                         phone_match = re.search(r'\d{10,13}', user_text)
                         if phone_match:
@@ -75,13 +70,11 @@ def webhook():
                         else:
                             reply_text = "📦 Please share your 10-digit phone number to track the order."
 
-                    # Handle product recommendations
                     elif any(keyword in user_text.lower() for keyword in 
-                             ["product", "buy", "recommend", "suggest", "shampoo", "oil", 
-                              "serum", "cream", "kumkumadi", "kajal", "face wash", "under eye", "cleanser", "cleaning milk"]):
-                        reply_text = get_product_recommendation(user_text)
-
-                    # Handle wellness questions (Gemini AI)
+                             ["product", "buy", "recommend", "suggest", "shampoo", "oil", "serum", 
+                              "cream", "kumkumadi", "kajal", "face wash", "purchase", "link", "combo", "want to buy", "give link"]):
+                        last_product = user_context[user_id].get("last_product")
+                        reply_text = get_product_recommendation(user_text, last_product=last_product)
                     else:
                         reply_text = get_gemini_reply(user_text, user_id)
 
@@ -112,4 +105,3 @@ def send_whatsapp_message(recipient_id, message):
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
-
