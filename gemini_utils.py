@@ -4,15 +4,14 @@ import google.generativeai as genai
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-# Load .env and configure API
+# Load environment variables
 load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
-# Gemini model & memory
-MODEL_NAME = "models/gemini-1.5-pro-latest"
-memory_store = defaultdict(list)  # user_id → [(timestamp, message)]
+# ✅ Use the faster, quota-efficient model
+MODEL_NAME = "models/gemini-2.5-flash"
+memory_store = defaultdict(list)  # user_id → list of (timestamp, message)
 
-# System Prompt
 SYSTEM_PROMPT = """
 🔮 TACX Ayurvedic AI Support (WhatsApp Version)
 
@@ -32,15 +31,16 @@ ALWAYS end response with:
 """
 
 def get_recent_history(user_id):
+    history = memory_store[user_id]
     now = datetime.utcnow()
+    # keep only last 5 messages from past 10 mins
     memory_store[user_id] = [
-        (ts, msg) for ts, msg in memory_store[user_id]
-        if now - ts < timedelta(minutes=10)
+        (ts, msg) for ts, msg in history if now - ts < timedelta(minutes=10)
     ]
     return memory_store[user_id][-5:]
 
-def add_to_memory(user_id, msg):
-    memory_store[user_id].append((datetime.utcnow(), msg))
+def add_to_memory(user_id, user_text):
+    memory_store[user_id].append((datetime.utcnow(), user_text))
 
 def get_gemini_reply(user_id, user_text):
     add_to_memory(user_id, user_text)
@@ -54,20 +54,7 @@ def get_gemini_reply(user_id, user_text):
         model = genai.GenerativeModel(MODEL_NAME)
         response = model.generate_content(conversation)
         return response.text.strip()
-
     except Exception as e:
         print("❌ Gemini Error:", e)
-        if "429" in str(e):
-            return (
-                "⚠️ AI quota limit reached. Please try again later. "
-                "We're working to restore the service. 🙏"
-            )
-        return (
-            "🧠 Sorry! AI system is overloaded right now. "
-            "But here's a general remedy for common issues:\n\n"
-            "💊 Ashwagandha Capsules + Tulsi Tea\n\n"
-            "⭐ Recommended TACX Product:\n"
-            "🧴 Daily Balance Pack\n🔘 [🛒 Buy Now] [📖 Learn More]"
-        )
+        return "⚠️ Gemini AI quota limit reached or failed to respond. Please try again later."
 
-  
