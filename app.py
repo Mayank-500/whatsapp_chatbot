@@ -74,13 +74,15 @@ def webhook():
                             reply_text = order_status or "❌ No order found with this number."
                         else:
                             reply_text = "📦 Please share your 10-digit phone number to track the order."
+
                     # Handle product recommendations
                     elif any(keyword in user_text.lower() for keyword in 
-                            ["product", "buy", "recommend", "suggest", "shampoo", "oil", 
-                             "serum", "cream", "kumkumadi", "kajal", "face wash"]):
+                             ["product", "buy", "recommend", "suggest", "shampoo", "oil", 
+                              "serum", "cream", "kumkumadi", "kajal", "face wash", "under eye", "cleanser", "cleaning milk"]):
                         reply_text = get_product_recommendation(user_text)
+
+                    # Handle wellness questions (Gemini AI)
                     else:
-                        # Otherwise handle via Gemini AI
                         reply_text = get_gemini_reply(user_text, user_id)
 
                     send_whatsapp_message(user_id, reply_text)
@@ -110,3 +112,4 @@ def send_whatsapp_message(recipient_id, message):
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
+

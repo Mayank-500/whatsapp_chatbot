@@ -1,5 +1,5 @@
 import os
-import google.generativeai as genai
+import google.generativeai as genai 
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -8,9 +8,8 @@ def get_product_recommendation(user_query):
     """Get product recommendation from specialized Gemini model"""
     try:
         genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-        
         model = genai.GenerativeModel("gemini-2.5-flash")
-        
+
         system_instruction = """You are TACX Product Recommendation AI, an expert assistant for The Ayurveda Co. (TACX) WhatsApp bot. Your job is to intelligently suggest product links, combo options, and offers — but only when a product is actually recommended during the chat, not randomly or repetitively.
 
 🧠 Core Responsibilities:
@@ -25,7 +24,7 @@ Show any available offers/discounts related to the product or combo only when th
 Avoid suggesting products, combos, or offers again in the same session unless the user asks again explicitly.
 
 Input Data: urldata-{
-    "Upto 20% Off!": {
+     "Upto 20% Off!": {
         "url": "https://theayurvedaco.com/collections/all-products-onsite"
     },
     "Additional 7% Off on All Prepaid Orders!": {
@@ -1154,20 +1153,20 @@ Input Data: urldata-{
   "BhringaBali Hair Growth CapsulesSold out": {
     "url": "https://theayurvedaco.com/products/bhringabali-hair-growth-30-veg-capsules"
   }
-}"""  
-        
+    
+    
+}
+"""
+
+        full_prompt = f"{system_instruction}\n\nUser query: {user_query}"
+
         response = model.generate_content(
-            contents=[{
-                "role": "user",
-                "parts": [user_query]
-            }],
-            generation_config={
-                "system_instruction": system_instruction
-            }
+            [full_prompt],
+            generation_config=genai.types.GenerationConfig(temperature=0.7)
         )
-        
-        return response.text
-        
+
+        return response.text.strip()
+
     except Exception as e:
         print(f"❌ Recommendation Error: {str(e)}")
         return "I'm having trouble accessing product recommendations right now. Please try again later."
