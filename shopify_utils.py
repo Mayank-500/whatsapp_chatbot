@@ -32,10 +32,8 @@ query GetCustomers {
 
 def fetch_order_status_by_phone(phone_number):
     query = QUERY_TEMPLATE % phone_number
-
     try:
         response = requests.post(SHOPIFY_API_URL, headers=HEADERS, json={"query": query})
-
         if response.status_code != 200:
             print("⚠️ Shopify API error:", response.text)
             return "❌ Failed to fetch order details. Please try again later."
@@ -53,10 +51,7 @@ def fetch_order_status_by_phone(phone_number):
             return f"📭 No orders found for {customer.get('firstName', 'this customer')}."
 
         latest_order = orders[0]
-        order_name = latest_order.get("name")
-        status = latest_order.get("displayFulfillmentStatus")
-
-        return f"📦 Order *{order_name}* is currently: *{status}*."
+        return f"📦 Order *{latest_order['name']}* is currently: *{latest_order['displayFulfillmentStatus']}*."
 
     except Exception as e:
         print("❌ Shopify Exception:", e)
