@@ -1,57 +1,61 @@
-# pip install google-generativeai
 import os
-import google.generativeai as genai
 from dotenv import load_dotenv
+import google.generativeai as genai
+from collections import defaultdict
+from datetime import datetime, timedelta
 
+# Load .env variables
 load_dotenv()
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# Model settings
+MODEL_NAME = "models/gemini-1.5-pro-latest"
+memory_store = defaultdict(list)  # user_id → list of (timestamp, message)
 
-PRIMARY_MODEL = "models/gemini-2.5-flash"
-FALLBACK_MODEL = "models/gemini-pro"
-
+# Base prompt
 SYSTEM_PROMPT = """
 🔮 TACX Ayurvedic AI Support (WhatsApp Version)
 
-You are TACX – the Ayurvedic AI Expert of The Ayurveda Co.  
-Respond ONLY to health, beauty & wellness topics rooted in Ayurveda × Modern Science.  
-Focus Areas: Doshas, skin/hair/body issues, sleep, gut, mental health, herbs, beauty, energy, immunity, etc.
+You are TACX – the Ayurvedic AI Expert of The Ayurveda Co.
+ONLY answer health, beauty & wellness queries rooted in Ayurveda × Modern Science.
+Never reply to greetings, coupon/refund/order/delivery or unrelated topics.
 
-🚫 Strictly DO NOT reply to:
-hi, hello, namaste, hey, morning, coupon, refund, complaint, abuse, delivery, order, track status — or any non-ayurvedic conversation.
+Reply in Hinglish, use crisp 5-6 line messages with emojis and varied tones.
 
-✅ Conversational Rules:
-- Keep reply short, crisp, max 6 lines
-- Use Hinglish (Hindi+English), like a friendly Ayurvedic doctor
-- Use creative, varied response styles (✨ emojis, ⭐ bullets, 🔗 CTA buttons)
-- Maintain memory for flowing conversations
-- Never sound robotic or repetitive
+Handle health/body queries with smart quizzes in 3 steps.
+Do NOT re-trigger quizzes if user ignores them.
+ALWAYS end response with:
 
-🧠 Smart Quiz System (Only for Body-Related Concerns):
-If user talks about health/body symptoms (like hair fall, digestion, sleep, acne, weight), trigger a **3-step interactive quiz** to identify exact concern:
-  - Step 1: Ask 3 possible types of the problem
-  - Step 2: Wait for 1/2/3
-  - Step 3: Recommend products + combo
-
-Do NOT show quiz for questions like “what is triphala” or “benefits of tulsi”.
+⭐ Recommended TACX Product:  
+🧴 *Product Name*  
+🔘 [🛒 Buy Now] [📖 Learn More]
 """
 
-def generate_with_model(model_name, user_query):
-    model = genai.GenerativeModel(model_name)
-    response = model.generate_content(
-        contents=[
-            {"role": "user", "parts": [SYSTEM_PROMPT + f"\n\nUser: {user_query}"]}
-        ]
-    )
-    return response.text.strip()
+def get_recent_history(user_id):
+    history = memory_store[user_id]
+    # Keep only last 5 messages from last 10 minutes
+    now = datetime.utcnow()
+    memory_store[user_id] = [
+        (ts, msg) for ts, msg in history if now - ts < timedelta(minutes=10)
+    ]
+    return memory_store[user_id][-5:]
 
-def get_gemini_reply(user_query):
+def add_to_memory(user_id, user_text):
+    memory_store[user_id].append((datetime.utcnow(), user_text))
+
+def get_gemini_reply(user_id, user_text):
+    add_to_memory(user_id, user_text)
     try:
-        return generate_with_model(PRIMARY_MODEL, user_query)
-    except Exception as e:
-        print(f"⚠️ Primary model failed: {e}")
-        try:
-            return generate_with_model(FALLBACK_MODEL, user_query)
-        except Exception as fallback_error:
-            return f"❌ Gemini Fallback Error: {str(fallback_error)}"
+        history = get_recent_history(user_id)
+        conversation = [{"role": "user", "parts": [SYSTEM_PROMPT]}]
+        for _, msg in history:
+            conversation.append({"role": "user", "parts": [msg]})
+        conversation.append({"role": "user", "parts": [user_text]})
 
+        model = genai.GenerativeModel(MODEL_NAME)
+        response = model.generate_content(conversation)
+        return response.text.strip()
+    except Exception as e:
+        print("❌ Gemini Error:", e)
+        return "❌ Gemini Fallback Error: AI couldn't respond. Please rephrase your query."
+  
