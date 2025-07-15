@@ -3,16 +3,11 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-def get_product_recommendation(user_query, last_product=None):
+def get_product_recommendation(user_query):
     try:
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
         model = genai.GenerativeModel("gemini-2.5-flash")
-
-        if not any(word in user_query.lower() for word in ["cream", "oil", "serum", "kajal", "shampoo", "buy", "link", "purchase"]) and last_product:
-            query_text = f"I want to buy {last_product}"
-        else:
-            query_text = user_query
 
         system_instruction = """You are TACX Product Recommendation AI, an expert assistant for The Ayurveda Co. (TACX) WhatsApp bot. Your job is to intelligently suggest product links, combo options, and offers — but only when a product is actually recommended during the chat, not randomly or repetitively.
 
@@ -1162,7 +1157,7 @@ Input Data: urldata-{
         response = model.generate_content(
             contents=[{
                 "role": "user",
-                "parts": [query_text]
+                "parts": [user_query]
             }],
             generation_config={
                 "system_instruction": system_instruction
@@ -1170,7 +1165,7 @@ Input Data: urldata-{
         )
 
         return response.text
-        
+
     except Exception as e:
         print(f"❌ Recommendation Error: {str(e)}")
         return "I'm having trouble accessing product recommendations right now. Please try again later."

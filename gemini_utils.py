@@ -49,6 +49,7 @@ def get_gemini_reply(user_text, user_id=None):
         user_text_clean = user_text.lower().strip()
         memory.append(user_text)
 
+        # Track last product
         product_keywords = {
             "kajal": "Ayurvedic Black Kajal",
             "kumkumadi": "Kumkumadi Face Wash",
@@ -56,17 +57,16 @@ def get_gemini_reply(user_text, user_id=None):
             "serum": "Glow Boosting Face Serum",
             "shampoo": "Onion Hair Shampoo",
             "cream": "Vitamin C & E Face Cream",
-            "balm": "Eucalyptus & Peppermint Pain Relief Balm"
+            "balm": "Eucalyptus & Peppermint Pain Relief Balm",
+            "potli": "Mahanarayan Potli"
         }
-
         for keyword, product in product_keywords.items():
             if keyword in user_text_clean:
                 context["last_product"] = product
                 break
 
         prompt_parts = [SYSTEM_PROMPT]
-        conversation_context = memory[-14:]
-        prompt_parts.extend(conversation_context)
+        prompt_parts.extend(memory[-10:])
         prompt_parts.append(user_text)
 
         response = model.generate_content(
@@ -83,4 +83,7 @@ def get_gemini_reply(user_text, user_id=None):
     except Exception as e:
         print("❌ Gemini Error:", e)
         return "Sorry, I'm having trouble processing your request. Please try again later."
+
+def get_last_product(user_id):
+    return user_context[user_id].get("last_product")
 

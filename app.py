@@ -5,9 +5,10 @@ import os
 import re
 from dotenv import load_dotenv
 from shopify_utils import fetch_order_status_by_phone
-from gemini_utils import get_gemini_reply, user_context
+from gemini_utils import get_gemini_reply, get_last_product
 from recommendation_utils import get_product_recommendation
 
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
@@ -16,6 +17,7 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 
+# Load FAQ data
 with open('faq.json') as f:
     FAQ_DATA = json.load(f)
 
@@ -56,11 +58,13 @@ def webhook():
                     user_id = message.get("from")
                     user_text = message.get("text", {}).get("body", "").strip()
 
+                    # First check FAQ
                     faq_response = check_faq(user_text)
                     if faq_response:
                         send_whatsapp_message(user_id, faq_response)
                         continue
 
+                    # Handle order tracking
                     if re.search(r"\b(order|track|refund)\b", user_text.lower()):
                         phone_match = re.search(r'\d{10,13}', user_text)
                         if phone_match:
@@ -70,11 +74,19 @@ def webhook():
                         else:
                             reply_text = "📦 Please share your 10-digit phone number to track the order."
 
-                    elif any(keyword in user_text.lower() for keyword in 
-                             ["product", "buy", "recommend", "suggest", "shampoo", "oil", "serum", 
-                              "cream", "kumkumadi", "kajal", "face wash", "purchase", "link", "combo", "want to buy", "give link"]):
-                        last_product = user_context[user_id].get("last_product")
-                        reply_text = get_product_recommendation(user_text, last_product=last_product)
+                    # Handle product recommendations + memory
+                    elif any(keyword in user_text.lower() for keyword in [
+                        "product", "buy", "recommend", "suggest", "shampoo", "oil",
+                        "serum", "cream", "kumkumadi", "kajal", "face wash", "link"
+                    ]):
+                        if "link" in user_text.lower() or "buy" in user_text.lower():
+                            last_product = get_last_product(user_id)
+                            if last_product:
+                                reply_text = get_product_recommendation(last_product)
+                            else:
+                                reply_text = "Please mention the product name you'd like to buy."
+                        else:
+                            reply_text = get_product_recommendation(user_text)
                     else:
                         reply_text = get_gemini_reply(user_text, user_id)
 
