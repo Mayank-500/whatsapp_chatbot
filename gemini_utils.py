@@ -3,17 +3,12 @@ import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-# Load .env
 load_dotenv()
-
-# API Key
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
-# Models
 PRIMARY_MODEL = "models/gemini-2.5-flash"
 FALLBACK_MODEL = "models/gemini-pro"
 
-# System prompt
 SYSTEM_PROMPT = """
 🔮 TACX Ayurvedic AI Support (WhatsApp Version)
 
@@ -32,7 +27,21 @@ hi, hello, namaste, hey, morning, coupon, refund, complaint, abuse, delivery, or
 - Never sound robotic or repetitive
 
 🧠 Smart Quiz System (Only for Body-Related Concerns):
-... (truncated for brevity, include your full prompt here if needed)
+If user talks about health/body symptoms (like hair fall, digestion, sleep, acne, weight), trigger a **3-step interactive quiz** to identify exact concern:
+  - Step 1: Ask 3 possible types of the problem
+  - Step 2: User replies with number (1, 2, or 3)
+  - Step 3: Give smart Ayurvedic product recommendation based on the selection
+🛑 Do NOT run quiz on non-body topics like: tulsi benefits, what is triphala, etc.
+❌ Do NOT say “Start Quiz” again and again – show only once, and don’t follow up if ignored.
+⛔ Do not repeat earlier steps or explanations after Step 3.
+
+📸 For every reply, ALWAYS end with:
+
+⭐ Recommended TACX Product:  
+🧴 *Product Name*  
+🔘 [🛒 Buy Now] [📖 Learn More]
+
+🎁 If applicable, show Combo Offers from curated `combo.json` list
 """
 
 def generate_with_model(model_name, user_query):
@@ -52,10 +61,11 @@ def get_gemini_reply(user_query):
         try:
             return generate_with_model(FALLBACK_MODEL, user_query)
         except Exception as fallback_error:
-            return f"❌ Gemini Fallback Error: {str(fallback_error)}"
+            print(f"❌ Fallback model failed: {fallback_error}")
+            return "⚠️ Gemini AI error. Please try again later."
 
+# Optional test
 if __name__ == "__main__":
     user_input = input("📝 Enter a sample user query: ")
     print("\n🤖 Gemini Reply:\n")
     print(get_gemini_reply(user_input))
-

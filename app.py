@@ -17,7 +17,7 @@ PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 WHATSAPP_API_URL = f"https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages"
 
-# Load FAQ data (optional)
+# Load FAQ data
 FAQ_FILE = "faq.json"
 faq = {}
 if os.path.exists(FAQ_FILE):
@@ -34,12 +34,12 @@ def verify():
         return challenge, 200
     return "Verification failed", 403
 
-# -------------------- Webhook for WhatsApp Messages --------------------
+# -------------------- WhatsApp Webhook Handler --------------------
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
     try:
-        message = data['entry'][0]['changes'][0]['value']['messages'][0]
+        message = data['entry'][0]['changes'][0]['value'].get('messages', [])[0]
         user_id = message['from']
 
         if 'text' not in message:
@@ -49,21 +49,22 @@ def webhook():
         user_text = message['text']['body'].lower()
         print("📩 Received message:", user_text)
 
+        # 1. Shopify Order Lookup
         phone = extract_phone_number(user_text)
         if phone:
             reply = fetch_order_status_by_phone(phone)
             send_whatsapp_message(user_id, reply)
             return "OK", 200
 
+        # 2. FAQ Check
         reply = check_faq(user_text)
-        print("📚 FAQ reply:", reply)
-
         if reply:
             send_whatsapp_message(user_id, reply)
-        else:
-            ai_reply = get_gemini_reply(user_text)
-            print("🤖 Gemini reply:", ai_reply)
-            send_whatsapp_message(user_id, ai_reply)
+            return "OK", 200
+
+        # 3. Gemini AI Reply
+        gemini_reply = get_gemini_reply(user_text)
+        send_whatsapp_message(user_id, gemini_reply)
 
     except Exception as e:
         print("❌ Webhook error:", e)
@@ -71,9 +72,9 @@ def webhook():
     return "OK", 200
 
 # -------------------- Helper Functions --------------------
-
 def extract_phone_number(message):
-    match = re.search(r"\b\d{10}\b", message)
+    cleaned = re.sub(r"[^\d]", "", message)
+    match = re.search(r"\b\d{10}\b", cleaned[-10:])
     if match:
         return "+91" + match.group()
     return None
@@ -97,9 +98,12 @@ def send_whatsapp_message(to, message):
         "text": {"body": message}
     }
     r = requests.post(WHATSAPP_API_URL, headers=headers, json=payload)
-    print("✅ Message sent:", r.status_code, r.text)
+    if r.status_code == 200:
+        print("✅ Message sent successfully")
+    else:
+        print("❌ WhatsApp send error:", r.status_code, r.text)
 
-# -------------------- Start Flask App --------------------
+# -------------------- Start Server --------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)

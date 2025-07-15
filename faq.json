@@ -1,14 +1,14 @@
 {
   "greeting": {
-    "keywords": ["hi", "hello", "namaste", "hey", "morning", "evening","afternoon"],
+    "keywords": ["hi", "hello", "hey", "morning", "evening","afternoon"],
     "response": "Namaste. Welcome to TACX - The Ayurveda Co. 🌿 How may I help you today?\n1. Explore Products\n2. Track Order\n3. Ask a Wellness Question"
   }, 
   "shipping": {
-      "keywords": ["shipping", "delivery", "time", "when", "receive"],
+      "keywords": ["shipping", "delivery", "receive"],
       "response": "🚚 Your order will be delivered within 3-5 working days across India!"
     },
     "returns": {
-      "keywords": ["return", "refund", "replace"],
+      "keywords": ["refund", "replace"],
       "response": "🔁 We offer easy returns within 7 days of delivery for unopened products."
     }
   }

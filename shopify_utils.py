@@ -2,7 +2,6 @@ import os
 import requests
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 SHOPIFY_API_URL = os.getenv("SHOPIFY_API_URL")
@@ -35,11 +34,7 @@ def fetch_order_status_by_phone(phone_number):
     query = QUERY_TEMPLATE % phone_number
 
     try:
-        response = requests.post(
-            SHOPIFY_API_URL,
-            headers=HEADERS,
-            json={"query": query}
-        )
+        response = requests.post(SHOPIFY_API_URL, headers=HEADERS, json={"query": query})
 
         if response.status_code != 200:
             print("⚠️ Shopify API error:", response.text)
