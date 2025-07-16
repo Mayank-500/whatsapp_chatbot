@@ -3,14 +3,13 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 def get_product_recommendation(user_query):
-    """Get product recommendation from specialized Gemini model"""
     try:
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-        model = genai.GenerativeModel("gemini-2.5-flash")
-
-        system_instruction = """You are TACX Product Recommendation AI, an expert assistant for The Ayurveda Co. (TACX) WhatsApp bot. Your job is to intelligently suggest product links, combo options, and offers — but only when a product is actually recommended during the chat, not randomly or repetitively.
+        system_instruction ="""You are TACX Product Recommendation AI, an expert assistant for The Ayurveda Co. (TACX) WhatsApp bot. Your job is to intelligently suggest product links, combo options, and offers — but only when a product is actually recommended during the chat, not randomly or repetitively.
 
 🧠 Core Responsibilities:
 
@@ -1155,15 +1154,14 @@ Input Data: urldata-{
   }
 }""" 
 
-        full_prompt = f"{system_instruction}\n\nUser query: {user_query}"
+        prompt = f"{system_instruction}\n\nUser query: {user_query}"
 
         response = model.generate_content(
-            [full_prompt],
+            [prompt],
             generation_config=genai.types.GenerationConfig(temperature=0.7)
         )
-
         return response.text.strip()
 
     except Exception as e:
         print(f"❌ Recommendation Error: {str(e)}")
-        return "I'm having trouble accessing product recommendations right now. Please try again later."
+        return "⚠️ Product recommendation engine is currently unavailable. Try again later."

@@ -6,8 +6,8 @@ from collections import defaultdict
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
 model = genai.GenerativeModel("gemini-2.5-pro")
+
 user_memory = defaultdict(list)
 user_context = defaultdict(dict)
 
@@ -26,7 +26,7 @@ SYSTEM_PROMPT = """
 🧠 QUIZ FLOW (Trigger only ONCE for body issues like hair fall, acne, digestion):
 1. Ask about the type of issue (give 3 options)
 2. Wait for reply (1/2/3)
-3. Recommend solution + product + combo
+3. Recommend solution + product* + combo*
 
 🗣️ Style:
 - Hinglish tone
@@ -39,42 +39,33 @@ SYSTEM_PROMPT = """
 
 def get_gemini_reply(user_text, user_id=None):
     try:
-        if user_id:
-            memory = user_memory[user_id]
-            context = user_context[user_id]
-        else:
-            memory = []
-            context = {}
+        memory = user_memory[user_id]
+        context = user_context[user_id]
 
         user_text_clean = user_text.lower().strip()
         memory.append(user_text)
 
-        # Track last product mentioned
         product_keywords = {
             "kajal": "Ayurvedic Black Kajal",
             "kumkumadi": "Kumkumadi Face Wash",
             "oil": "Ayurvedic Hair Oil",
             "serum": "Glow Boosting Face Serum",
-            "shampoo": "Onion Hair Shampoo"
+            "shampoo": "Onion Hair Shampoo",
+            "shilajit": "AyurJosh Shilajit Resin"
         }
-        
         for keyword, product in product_keywords.items():
             if keyword in user_text_clean:
                 context["last_product"] = product
                 break
 
-        # Compose prompt with memory context
         prompt_parts = [SYSTEM_PROMPT]
         prompt_parts.extend(memory[-10:])
         prompt_parts.append(user_text)
 
         response = model.generate_content(
             prompt_parts,
-            generation_config=genai.types.GenerationConfig(
-                temperature=0.7
-            )
+            generation_config=genai.types.GenerationConfig(temperature=0.7)
         )
-        
         reply = response.text.strip()
         memory.append(reply)
         return reply
@@ -82,4 +73,5 @@ def get_gemini_reply(user_text, user_id=None):
     except Exception as e:
         print("❌ Gemini Error:", e)
         return "Sorry, I'm having trouble processing your request. Please try again later."
+
 
