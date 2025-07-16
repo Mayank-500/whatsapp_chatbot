@@ -7,7 +7,7 @@ import re
 from dotenv import load_dotenv
 from shopify_utils import fetch_order_status_by_phone
 from gemini_utils import get_gemini_reply
-from rec_utils import get_product_recommendation
+from recommendation_utils import get_product_recommendation
 
 # Load environment variables
 load_dotenv()
