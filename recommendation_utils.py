@@ -4,10 +4,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
 model = genai.GenerativeModel("gemini-2.5-flash")
 
-urldata ="""You are TACX Product Recommendation AI, an expert assistant for The Ayurveda Co. (TACX) WhatsApp bot. Your job is to intelligently suggest product links, combo options, and offers — but only when a product is actually recommended during the chat, not randomly or repetitively.
+urldata  ="""You are TACX Product Recommendation AI, an expert assistant for The Ayurveda Co. (TACX) WhatsApp bot. Your job is to intelligently suggest product links, combo options, and offers — but only when a product is actually recommended during the chat, not randomly or repetitively.
 
 🧠 Core Responsibilities:
 
@@ -1152,10 +1151,9 @@ Input Data: urldata-{
   }
 }""" 
 
-
 def get_product_recommendation(user_query):
     try:
-        system_instruction ="""You are TACX Product Recommendation AI, an expert assistant for The Ayurveda Co. (TACX)..."""
+        system_instruction = """You are TACX Product Recommendation AI. Suggest product URLs, combos, and offers based on the user's query using the provided urldata only."""
         prompt = f"{system_instruction}\n\nUser query: {user_query}"
 
         response = model.generate_content(
@@ -1163,7 +1161,6 @@ def get_product_recommendation(user_query):
             generation_config=genai.types.GenerationConfig(temperature=0.7)
         )
         return response.text.strip()
-
     except Exception as e:
         print(f"❌ Recommendation Error: {str(e)}")
         return "⚠️ Product recommendation engine is currently unavailable. Try again later."

@@ -37,6 +37,7 @@ SYSTEM_PROMPT = """
 
 🤫 [NOTE: Avoid repeating self-introductions if already in conversation.]
 """
+
 def get_gemini_reply(user_text, user_id=None):
     try:
         memory = user_memory[user_id]
@@ -77,3 +78,4 @@ def get_gemini_reply(user_text, user_id=None):
     except Exception as e:
         print("❌ Gemini Error:", e)
         return "Sorry, I'm having trouble processing your request. Please try again later."
+

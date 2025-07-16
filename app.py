@@ -18,12 +18,12 @@ PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 
 # Load FAQ data
-with open('faq.json') as f:
+with open('faq.json', encoding='utf-8') as f:
     FAQ_DATA = json.load(f)
 
 @app.route('/')
 def home():
-    return "\U0001F33F TACX Ayurvedic AI Bot is running."
+    return "🌿 TACX Ayurvedic AI Bot is running."
 
 @app.route('/webhook', methods=['GET'])
 def verify():
@@ -43,7 +43,7 @@ def check_faq(user_text):
 def webhook():
     try:
         data = request.get_json()
-        print("\ud83d\udce9 Received message:", json.dumps(data, indent=2))
+        print("📩 Received message:", json.dumps(data, indent=2))
 
         for entry in data.get("entry", []):
             for change in entry.get("changes", []):
@@ -54,7 +54,6 @@ def webhook():
                     continue
 
                 for message in messages:
-                    phone_number = value.get("metadata", {}).get("display_phone_number", "")
                     user_id = message.get("from")
                     user_text = message.get("text", {}).get("body", "").strip()
 
@@ -65,14 +64,14 @@ def webhook():
                         continue
 
                     # Order tracking
-                    if re.search(r"\\b(order|track|refund)\\b", user_text.lower()):
+                    if re.search(r"\b(order|track|refund)\b", user_text.lower()):
                         phone_match = re.search(r'\d{10,13}', user_text)
                         if phone_match:
                             number = phone_match.group()[-10:]
                             order_status = fetch_order_status_by_phone(number)
                             reply_text = order_status or "❌ No order found with this number."
                         else:
-                            reply_text = "\ud83d\ude9e Please share your 10-digit phone number to track the order."
+                            reply_text = "🚞 Please share your 10-digit phone number to track the order."
 
                     # Product recommendation
                     elif any(keyword in user_text.lower() for keyword in [
@@ -102,12 +101,12 @@ def send_whatsapp_message(recipient_id, message):
         "to": recipient_id,
         "type": "text",
         "text": {
-            "body": message.encode('utf-8', errors='ignore').decode('utf-8')
+            "body": message  # ✅ FIXED: removed utf-8 encode/decode
         }
     }
 
-    response = requests.post(url, headers=headers, json=payload)
-    print("✅ Message sent:", response.status_code, response.text)
-
-if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        print("✅ Message sent:", response.status_code, response.text)
+    except Exception as e:
+        print("❌ Failed to send message:", str(e))
