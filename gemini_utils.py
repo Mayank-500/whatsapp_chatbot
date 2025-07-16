@@ -3,6 +3,7 @@ import re
 import google.generativeai as genai
 from dotenv import load_dotenv
 from collections import defaultdict
+from recommendation_utils import urldata
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -36,7 +37,6 @@ SYSTEM_PROMPT = """
 
 🤫 [NOTE: Avoid repeating self-introductions if already in conversation.]
 """
-
 def get_gemini_reply(user_text, user_id=None):
     try:
         memory = user_memory[user_id]
@@ -53,9 +53,13 @@ def get_gemini_reply(user_text, user_id=None):
             "shampoo": "Onion Hair Shampoo",
             "shilajit": "AyurJosh Shilajit Resin"
         }
+
         for keyword, product in product_keywords.items():
             if keyword in user_text_clean:
-                context["last_product"] = product
+                if product in urldata:
+                    context["last_product"] = product
+                else:
+                    print(f"❌ Unknown Gemini product skipped: {product}")
                 break
 
         prompt_parts = [SYSTEM_PROMPT]
@@ -73,5 +77,3 @@ def get_gemini_reply(user_text, user_id=None):
     except Exception as e:
         print("❌ Gemini Error:", e)
         return "Sorry, I'm having trouble processing your request. Please try again later."
-
-

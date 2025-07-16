@@ -7,9 +7,7 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 model = genai.GenerativeModel("gemini-2.5-flash")
 
-def get_product_recommendation(user_query):
-    try:
-        system_instruction ="""You are TACX Product Recommendation AI, an expert assistant for The Ayurveda Co. (TACX) WhatsApp bot. Your job is to intelligently suggest product links, combo options, and offers — but only when a product is actually recommended during the chat, not randomly or repetitively.
+urldata ="""You are TACX Product Recommendation AI, an expert assistant for The Ayurveda Co. (TACX) WhatsApp bot. Your job is to intelligently suggest product links, combo options, and offers — but only when a product is actually recommended during the chat, not randomly or repetitively.
 
 🧠 Core Responsibilities:
 
@@ -1154,6 +1152,10 @@ Input Data: urldata-{
   }
 }""" 
 
+
+def get_product_recommendation(user_query):
+    try:
+        system_instruction ="""You are TACX Product Recommendation AI, an expert assistant for The Ayurveda Co. (TACX)..."""
         prompt = f"{system_instruction}\n\nUser query: {user_query}"
 
         response = model.generate_content(

@@ -23,7 +23,7 @@ with open('faq.json') as f:
 
 @app.route('/')
 def home():
-    return "🌿 TACX Ayurvedic AI Bot is running."
+    return "\U0001F33F TACX Ayurvedic AI Bot is running."
 
 @app.route('/webhook', methods=['GET'])
 def verify():
@@ -43,7 +43,7 @@ def check_faq(user_text):
 def webhook():
     try:
         data = request.get_json()
-        print("📩 Received message:", json.dumps(data, indent=2))
+        print("\ud83d\udce9 Received message:", json.dumps(data, indent=2))
 
         for entry in data.get("entry", []):
             for change in entry.get("changes", []):
@@ -65,14 +65,14 @@ def webhook():
                         continue
 
                     # Order tracking
-                    if re.search(r"\b(order|track|refund)\b", user_text.lower()):
+                    if re.search(r"\\b(order|track|refund)\\b", user_text.lower()):
                         phone_match = re.search(r'\d{10,13}', user_text)
                         if phone_match:
                             number = phone_match.group()[-10:]
                             order_status = fetch_order_status_by_phone(number)
                             reply_text = order_status or "❌ No order found with this number."
                         else:
-                            reply_text = "🛞 Please share your 10-digit phone number to track the order."
+                            reply_text = "\ud83d\ude9e Please share your 10-digit phone number to track the order."
 
                     # Product recommendation
                     elif any(keyword in user_text.lower() for keyword in [
@@ -92,11 +92,6 @@ def webhook():
     return "OK", 200
 
 def send_whatsapp_message(recipient_id, message):
-    try:
-        message = message.encode('utf-8', 'ignore').decode('utf-8')
-    except:
-        message = "🧠 Unable to encode this message."
-
     url = f"https://graph.facebook.com/v17.0/{PHONE_NUMBER_ID}/messages"
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
@@ -107,7 +102,7 @@ def send_whatsapp_message(recipient_id, message):
         "to": recipient_id,
         "type": "text",
         "text": {
-            "body": message
+            "body": message.encode('utf-8', errors='ignore').decode('utf-8')
         }
     }
 
