@@ -3,7 +3,6 @@ import re
 import google.generativeai as genai
 from dotenv import load_dotenv
 from collections import defaultdict
-from recommendation_utils import urldata
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -14,7 +13,7 @@ user_context = defaultdict(dict)
 
 SYSTEM_PROMPT = """
 🔮 You are TACX – the friendly Ayurvedic AI Expert of The Ayurveda Co., trained in Ayurveda × Modern Science.
---restrict yourself with in the ayurveda co.--do not reply outside the given-------
+
 🎯 Your ONLY goal is to reply to health, beauty & wellness topics rooted in Ayurveda. Focus areas:
 - Doshas (Vata, Pitta, Kapha), Gut Health, Sleep, Mental Clarity
 - Skin, Hair, Body issues
@@ -54,13 +53,9 @@ def get_gemini_reply(user_text, user_id=None):
             "shampoo": "Onion Hair Shampoo",
             "shilajit": "AyurJosh Shilajit Resin"
         }
-
         for keyword, product in product_keywords.items():
             if keyword in user_text_clean:
-                if product in urldata:
-                    context["last_product"] = product
-                else:
-                    print(f"❌ Unknown Gemini product skipped: {product}")
+                context["last_product"] = product
                 break
 
         prompt_parts = [SYSTEM_PROMPT]
@@ -78,4 +73,3 @@ def get_gemini_reply(user_text, user_id=None):
     except Exception as e:
         print("❌ Gemini Error:", e)
         return "Sorry, I'm having trouble processing your request. Please try again later."
-

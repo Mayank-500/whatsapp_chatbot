@@ -18,7 +18,7 @@ PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
 VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 
 # Load FAQ data
-with open('faq.json', encoding='utf-8') as f:
+with open('faq.json') as f:
     FAQ_DATA = json.load(f)
 
 @app.route('/')
@@ -54,6 +54,7 @@ def webhook():
                     continue
 
                 for message in messages:
+                    phone_number = value.get("metadata", {}).get("display_phone_number", "")
                     user_id = message.get("from")
                     user_text = message.get("text", {}).get("body", "").strip()
 
@@ -71,7 +72,7 @@ def webhook():
                             order_status = fetch_order_status_by_phone(number)
                             reply_text = order_status or "❌ No order found with this number."
                         else:
-                            reply_text = "🚞 Please share your 10-digit phone number to track the order."
+                            reply_text = "🛞 Please share your 10-digit phone number to track the order."
 
                     # Product recommendation
                     elif any(keyword in user_text.lower() for keyword in [
@@ -91,6 +92,11 @@ def webhook():
     return "OK", 200
 
 def send_whatsapp_message(recipient_id, message):
+    try:
+        message = message.encode('utf-8', 'ignore').decode('utf-8')
+    except:
+        message = "🧠 Unable to encode this message."
+
     url = f"https://graph.facebook.com/v17.0/{PHONE_NUMBER_ID}/messages"
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}",
@@ -101,12 +107,12 @@ def send_whatsapp_message(recipient_id, message):
         "to": recipient_id,
         "type": "text",
         "text": {
-            "body": message  # ✅ FIXED: removed utf-8 encode/decode
+            "body": message
         }
     }
 
-    try:
-        response = requests.post(url, headers=headers, json=payload)
-        print("✅ Message sent:", response.status_code, response.text)
-    except Exception as e:
-        print("❌ Failed to send message:", str(e))
+    response = requests.post(url, headers=headers, json=payload)
+    print("✅ Message sent:", response.status_code, response.text)
+
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)
